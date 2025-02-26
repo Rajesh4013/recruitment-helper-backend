@@ -46,7 +46,7 @@ POST /auth/login
 ```
 
 ### Register New User
-Create a new user (requires Recruiter role).
+Create a new user (requires authentication and Recruiter role).
 
 ```http
 POST /auth/signup
@@ -56,6 +56,7 @@ Authorization: Bearer {token}
 **Request Body:**
 ```json
 {
+    "employeeId": "number",
     "firstName": "string",
     "lastName": "string",
     "email": "string",
@@ -93,8 +94,45 @@ Authorization: Bearer {token}
 
 ## Employees
 
+### Create Employee
+Create a new employee (requires authentication and Recruiter role).
+
+```http
+POST /employees
+Authorization: Bearer {token}
+```
+
+**Request Body:**
+```json
+{
+    "employeeId": "number",
+    "firstName": "string",
+    "lastName": "string",
+    "email": "string",
+    "designation": "string" (optional),
+    "departmentId": "number" (optional)
+}
+```
+
+**Response (201 Created):**
+```json
+{
+    "success": true,
+    "data": {
+        "EmployeeID": "number",
+        "FirstName": "string",
+        "LastName": "string",
+        "Email": "string",
+        "Designation": "string",
+        "DepartmentID": "number",
+        "CreatedAt": "date"
+    },
+    "message": "Employee created successfully"
+}
+```
+
 ### Get All Employees
-Get a list of all employees (requires Recruiter or Manager role).
+Get a list of all employees (requires authentication).
 
 ```http
 GET /employees
@@ -104,7 +142,8 @@ Authorization: Bearer {token}
 **Query Parameters:**
 - `page`: number (optional, default: 1)
 - `limit`: number (optional, default: 10)
-- `search`: string (optional)
+- `search`: string (optional) - Search in FirstName, LastName, Email
+- `employeeId`: string (optional) - Search by partial employee ID
 - `departmentId`: number (optional)
 - `designation`: string (optional)
 - `sortBy`: string (optional)
@@ -185,41 +224,87 @@ Authorization: Bearer {token}
 }
 ```
 
-## Error Responses
+## Departments
 
-All endpoints may return these error responses:
+### Get All Departments
+Get a list of all departments (requires authentication).
 
-**403 Forbidden:**
+```http
+GET /departments
+Authorization: Bearer {token}
+```
+
+**Response (200 OK):**
 ```json
 {
-    "success": false,
-    "message": "Access denied. Insufficient permissions."
+    "success": true,
+    "data": [
+        {
+            "DepartmentID": "number",
+            "DepartmentName": "string"
+        }
+    ],
+    "message": "Departments retrieved successfully"
 }
 ```
 
-**401 Unauthorized:**
+### Get Department by ID
+Get details of a specific department.
+
+```http
+GET /departments/:id
+Authorization: Bearer {token}
+```
+
+**Response (200 OK):**
 ```json
 {
-    "success": false,
-    "message": "Access denied. No token provided."
+    "success": true,
+    "data": {
+        "DepartmentID": "number",
+        "DepartmentName": "string"
+    },
+    "message": "Department retrieved successfully"
 }
 ```
 
-**500 Internal Server Error:**
-```json
-{
-    "success": false,
-    "message": "Error message",
-    "error": "Detailed error information"
-}
-```
+## Skills
+
+### Get All Skills
+Get a list of all skills with search and pagination (requires authentication).
+
+```http
+GET /skills
+Authorization: Bearer {token}
 ```
 
-This documentation covers:
-- Authentication endpoints (login, signup)
-- Employee endpoints (get all, get by ID)
-- Request/Response formats
-- Error handling
-- Authorization requirements
-- Query parameters
-- Response status codes
+**Query Parameters:**
+- `page`: number (optional, default: 1)
+- `limit`: number (optional, default: 10)
+- `search`: string (optional) - Search in SkillName
+- `sortBy`: string (optional, default: 'SkillName')
+- `sortOrder`: 'asc' | 'desc' (optional, default: 'asc')
+
+**Response (200 OK):**
+```json
+{
+    "success": true,
+    "data": [
+        {
+            "SkillID": "number",
+            "SkillName": "string"
+        }
+    ],
+    "message": "Skills retrieved successfully",
+    "pagination": {
+        "total": "number",
+        "page": "number",
+        "limit": "number"
+    }
+}
+```
+
+### Get Skill by ID
+Get details of a specific skill.
+
+```
