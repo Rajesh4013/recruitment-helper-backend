@@ -1,0 +1,101 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlserver"
+  url      = env("DATABASE_URL")
+}
+
+model Department {
+  DepartmentID   Int        @id(map: "PK__Departme__B2079BCDD9D1FCA8")
+  DepartmentName String     @db.VarChar(100)
+  Employee       Employee[]
+}
+
+model Employee {
+  EmployeeID                                          Int                @id(map: "PK__Employee__7AD04FF10251F0D8")
+  FirstName                                           String             @db.VarChar(100)
+  LastName                                            String             @db.VarChar(100)
+  Email                                               String             @unique(map: "UQ__Employee__A9D1053400D9F00F") @db.VarChar(150)
+  Designation                                         String?            @db.VarChar(100)
+  DepartmentID                                        Int?
+  ManagerEmployeeID                                   Int?
+  CreatedAt                                           DateTime?          @default(now(), map: "DF__Employee__Create__3A81B327")
+  Department                                          Department?        @relation(fields: [DepartmentID], references: [DepartmentID], onDelete: NoAction, onUpdate: NoAction, map: "FK__Employee__Depart__3B75D760")
+  Employee                                            Employee?          @relation("EmployeeToEmployee", fields: [ManagerEmployeeID], references: [EmployeeID], onDelete: NoAction, onUpdate: NoAction, map: "FK__Employee__Manage__3C69FB99")
+  other_Employee                                      Employee[]         @relation("EmployeeToEmployee")
+  Login                                               Login?
+  ResourceRequests                                    ResourceRequests[]
+  UpdateTracker_UpdateTracker_EmployeeIDToEmployee    UpdateTracker[]    @relation("UpdateTracker_EmployeeIDToEmployee")
+  UpdateTracker_UpdateTracker_Level1PanelIDToEmployee UpdateTracker[]    @relation("UpdateTracker_Level1PanelIDToEmployee")
+  UpdateTracker_UpdateTracker_Level2PanelIDToEmployee UpdateTracker[]    @relation("UpdateTracker_Level2PanelIDToEmployee")
+}
+
+model JobDescription {
+  JobDescriptionID         Int               @id(map: "PK__JobDescr__B04880AAE33978BB")
+  Role                     String?           @db.VarChar(100)
+  OpenPositions            Int?
+  Experience               Int?
+  JobType                  String?           @db.VarChar(20)
+  ModeOfWork               String?           @db.VarChar(20)
+  RequiredTechnicalSkills  String?           @db.NVarChar(Max)
+  PreferredTechnicalSkills String?           @db.NVarChar(Max)
+  Location                 String?           @db.VarChar(150)
+  Education                String?           @db.VarChar(100)
+  Responsibility           String?           @db.NVarChar(Max)
+  Certifications           String?           @db.NVarChar(Max)
+  NoticePeriod             String?           @db.VarChar(50)
+  AdditionalReasons        String?           @db.NVarChar(Max)
+  ResourceRequests         ResourceRequests?
+  UpdateTracker            UpdateTracker[]
+}
+
+model Login {
+  EmployeeID   Int       @id(map: "PK__Login__7AD04FF1978B1B80")
+  Email        String    @unique(map: "UQ__Login__A9D10534B49D39A2") @db.VarChar(150)
+  PasswordHash String    @db.VarChar(255)
+  Role         String?   @db.VarChar(20)
+  LastLogin    DateTime? @default(now(), map: "DF__Login__LastLogin__4E88ABD4")
+  Employee     Employee  @relation(fields: [EmployeeID], references: [EmployeeID], onUpdate: NoAction, map: "FK__Login__EmployeeI__4F7CD00D")
+}
+
+model ResourceRequests {
+  ResourceRequestID Int             @id(map: "PK__Resource__CAA45C946244959F")
+  JobDescriptionID  Int?            @unique(map: "UQ__Resource__B04880AB4FED8C9C")
+  EmployeeID        Int?
+  Status            String?         @db.VarChar(20)
+  CreatedAt         DateTime?       @default(now(), map: "DF__ResourceR__Creat__46E78A0C")
+  AcceptedAt        DateTime?
+  UpdatedAt         DateTime?       @default(now(), map: "DF__ResourceR__Updat__47DBAE45")
+  Feedback          String?         @db.NVarChar(Max)
+  Employee          Employee?       @relation(fields: [EmployeeID], references: [EmployeeID], onDelete: NoAction, onUpdate: NoAction, map: "FK__ResourceR__Emplo__48CFD27E")
+  JobDescription    JobDescription? @relation(fields: [JobDescriptionID], references: [JobDescriptionID], onDelete: NoAction, onUpdate: NoAction, map: "FK__ResourceR__JobDe__49C3F6B7")
+}
+
+model Skills {
+  SkillID   Int    @id(map: "PK__Skills__DFA091E7DC3B500D")
+  SkillName String @db.VarChar(100)
+}
+
+model UpdateTracker {
+  UpdateTrackerID                                Int             @id(map: "PK__UpdateTr__B89744B5E48E3273") @default(autoincrement())
+  EmployeeID                                     Int?
+  JobDescriptionID                               Int?
+  Priority                                       String?         @db.VarChar(20)
+  ExpectedTimeline                               String?         @db.VarChar(100)
+  BudgetLimit                                    Decimal?        @db.Decimal(10, 2)
+  Level1PanelID                                  Int?
+  Level1PanelInterviewSlots                      String?         @db.NVarChar(Max)
+  Level2PanelID                                  Int?
+  Level2PanelInterviewSlots                      String?         @db.NVarChar(Max)
+  Comments                                       String?         @db.NVarChar(Max)
+  Status                                         String?         @db.VarChar(20)
+  LastUpdatedColumns                             String?         @db.NVarChar(Max)
+  CreatedAt                                      DateTime?       @default(now(), map: "DF__UpdateTra__Creat__5441852A")
+  UpdatedAt                                      DateTime?       @default(now(), map: "DF__UpdateTra__Updat__5535A963")
+  Employee_UpdateTracker_EmployeeIDToEmployee    Employee?       @relation("UpdateTracker_EmployeeIDToEmployee", fields: [EmployeeID], references: [EmployeeID], onDelete: NoAction, onUpdate: NoAction, map: "FK__UpdateTra__Emplo__571DF1D5")
+  JobDescription                                 JobDescription? @relation(fields: [JobDescriptionID], references: [JobDescriptionID], onDelete: NoAction, onUpdate: NoAction, map: "FK__UpdateTra__JobDe__5629CD9C")
+  Employee_UpdateTracker_Level1PanelIDToEmployee Employee?       @relation("UpdateTracker_Level1PanelIDToEmployee", fields: [Level1PanelID], references: [EmployeeID], onDelete: NoAction, onUpdate: NoAction, map: "FK__UpdateTra__Level__5812160E")
+  Employee_UpdateTracker_Level2PanelIDToEmployee Employee?       @relation("UpdateTracker_Level2PanelIDToEmployee", fields: [Level2PanelID], references: [EmployeeID], onDelete: NoAction, onUpdate: NoAction, map: "FK__UpdateTra__Level__59063A47")
+}
