@@ -1,16 +1,17 @@
 import express, { Request, Response } from 'express';
 import { employeeService } from '../services/employee.services.js';
 import { ApiErrorResponse, EmployeeQueryParams } from '../types/employee.types.js';
-import { authorizeRoles } from '../middleware/auth.middleware.js';
+import { authenticateToken } from '../middleware/auth.middleware.js';
 
 const router = express.Router();
 
-router.get('/', authorizeRoles('Recruiter', 'Manager'), async (req: Request, res: Response) => {
+router.get('/', authenticateToken, async (req: Request, res: Response) => {
     try {
         const queryParams: EmployeeQueryParams = {
             page: req.query.page ? parseInt(req.query.page as string) : undefined,
             limit: req.query.limit ? parseInt(req.query.limit as string) : undefined,
             search: req.query.search as string,
+            employeeIdSearch: req.query.employeeId as string,
             departmentId: req.query.departmentId ? parseInt(req.query.departmentId as string) : undefined,
             designation: req.query.designation as string,
             sortBy: req.query.sortBy as keyof EmployeeQueryParams['sortBy'],
@@ -29,7 +30,7 @@ router.get('/', authorizeRoles('Recruiter', 'Manager'), async (req: Request, res
     }
 });
 
-router.get('/:id', async (req, res) => {
+router.get('/:id', authenticateToken, async (req, res) => {
     try {
         const employeeId = parseInt(req.params.id);
         

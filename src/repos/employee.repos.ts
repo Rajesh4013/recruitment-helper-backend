@@ -11,6 +11,7 @@ export const employeeRepository = {
             search,
             departmentId,
             designation,
+            employeeIdSearch,
             sortBy = 'EmployeeID',
             sortOrder = 'asc'
         } = params;
@@ -21,6 +22,31 @@ export const employeeRepository = {
             AND: [
                 departmentId ? { DepartmentID: departmentId } : {},
                 designation ? { Designation: designation } : {},
+                employeeIdSearch ? {
+                    EmployeeID: {
+                        in: await prisma.employee.findMany({
+                            where: {
+                                EmployeeID: {
+                                    in: await prisma.employee
+                                        .findMany({
+                                            where: {
+                                                EmployeeID: {
+                                                    gt: 0
+                                                }
+                                            },
+                                            select: { EmployeeID: true }
+                                        })
+                                        .then(ids => 
+                                            ids
+                                                .filter(e => e.EmployeeID.toString().includes(employeeIdSearch))
+                                                .map(e => e.EmployeeID)
+                                        )
+                                }
+                            },
+                            select: { EmployeeID: true }
+                        }).then(ids => ids.map(e => e.EmployeeID))
+                    }
+                } : {},
                 search ? {
                     OR: [
                         { FirstName: { contains: search } },
