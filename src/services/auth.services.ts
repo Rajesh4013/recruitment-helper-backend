@@ -74,7 +74,6 @@ export const authService = {
                         EmployeeID: result.employee.EmployeeID,
                         FirstName: result.employee.FirstName,
                         LastName: result.employee.LastName,
-                        Email: result.employee.Email,
                         Role: result.login.Role as UserRole
                     }
                 },

@@ -50,7 +50,6 @@ export interface SignupResponse {
             EmployeeID: number;
             FirstName: string;
             LastName: string;
-            Email: string;
             Role: UserRole;
         };
     };

@@ -1,8 +1,7 @@
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '../utils/prisma.js';
 import bcrypt from 'bcrypt';
 import { SignupRequest, UserRole } from '../types/auth.types.js';
 
-const prisma = new PrismaClient();
 const SALT_ROUNDS = 10;
 
 export const authRepository = {
