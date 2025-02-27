@@ -8,28 +8,28 @@ datasource db {
 }
 
 model Department {
-  DepartmentID   Int        @id(map: "PK__Departme__B2079BCDD9D1FCA8")
+  DepartmentID   Int        @id(map: "PK_Department") @default(autoincrement())
   DepartmentName String     @db.VarChar(100)
   Employee       Employee[]
 }
 
 model Employee {
-  EmployeeID                                          Int                @id(map: "PK__Employee__7AD04FF10251F0D8")
-  FirstName                                           String             @db.VarChar(100)
-  LastName                                            String             @db.VarChar(100)
-  Email                                               String             @unique(map: "UQ__Employee__A9D1053400D9F00F") @db.VarChar(150)
-  Designation                                         String?            @db.VarChar(100)
-  DepartmentID                                        Int?
+  id                                                  String          @id(map: "PK_Employee") @default("substring(replace(CONVERT([varchar](36),newid()),'-','),(1),(8))", map: "DF__Employee__id__76969D2E") @db.Char(8)
+  EmployeeID                                          Int             @unique(map: "UQ_Employee_EmployeeID")
+  FirstName                                           String          @db.VarChar(100)
+  LastName                                            String          @db.VarChar(100)
+  Designation                                         String?         @db.VarChar(100)
+  DepartmentID                                        Int
   ManagerEmployeeID                                   Int?
-  CreatedAt                                           DateTime?          @default(now(), map: "DF__Employee__Create__3A81B327")
-  Department                                          Department?        @relation(fields: [DepartmentID], references: [DepartmentID], onDelete: NoAction, onUpdate: NoAction, map: "FK__Employee__Depart__3B75D760")
-  Employee                                            Employee?          @relation("EmployeeToEmployee", fields: [ManagerEmployeeID], references: [EmployeeID], onDelete: NoAction, onUpdate: NoAction, map: "FK__Employee__Manage__3C69FB99")
-  other_Employee                                      Employee[]         @relation("EmployeeToEmployee")
+  IsAdmin                                             Boolean         @default(false, map: "DF__Employee__IsAdmi__778AC167")
+  CreatedAt                                           DateTime?       @default(now(), map: "DF__Employee__Create__787EE5A0")
+  Department                                          Department      @relation(fields: [DepartmentID], references: [DepartmentID], onUpdate: NoAction, map: "FK__Employee__Depart__3B75D760")
+  Employee                                            Employee?       @relation("EmployeeToEmployee", fields: [ManagerEmployeeID], references: [EmployeeID], onDelete: NoAction, onUpdate: NoAction, map: "FK__Employee__Manage__3C69FB99")
+  other_Employee                                      Employee[]      @relation("EmployeeToEmployee")
   Login                                               Login?
-  ResourceRequests                                    ResourceRequests[]
-  UpdateTracker_UpdateTracker_EmployeeIDToEmployee    UpdateTracker[]    @relation("UpdateTracker_EmployeeIDToEmployee")
-  UpdateTracker_UpdateTracker_Level1PanelIDToEmployee UpdateTracker[]    @relation("UpdateTracker_Level1PanelIDToEmployee")
-  UpdateTracker_UpdateTracker_Level2PanelIDToEmployee UpdateTracker[]    @relation("UpdateTracker_Level2PanelIDToEmployee")
+  UpdateTracker_UpdateTracker_EmployeeIDToEmployee    UpdateTracker[] @relation("UpdateTracker_EmployeeIDToEmployee")
+  UpdateTracker_UpdateTracker_Level1PanelIDToEmployee UpdateTracker[] @relation("UpdateTracker_Level1PanelIDToEmployee")
+  UpdateTracker_UpdateTracker_Level2PanelIDToEmployee UpdateTracker[] @relation("UpdateTracker_Level2PanelIDToEmployee")
 }
 
 model JobDescription {
@@ -52,11 +52,12 @@ model JobDescription {
 }
 
 model Login {
-  EmployeeID   Int       @id(map: "PK__Login__7AD04FF1978B1B80")
-  Email        String    @unique(map: "UQ__Login__A9D10534B49D39A2") @db.VarChar(150)
+  id           String    @id(map: "PK_Login") @default("substring(replace(CONVERT([varchar](36),newid()),'-','),(1),(8))", map: "DF__Login__id__00200768") @db.Char(8)
+  EmployeeID   Int       @unique(map: "UQ_Login_EmployeeID")
+  Email        String    @unique(map: "UQ_Login_Email") @db.VarChar(150)
   PasswordHash String    @db.VarChar(255)
   Role         String?   @db.VarChar(20)
-  LastLogin    DateTime? @default(now(), map: "DF__Login__LastLogin__4E88ABD4")
+  LastLogin    DateTime? @default(now(), map: "DF__Login__LastLogin__01142BA1")
   Employee     Employee  @relation(fields: [EmployeeID], references: [EmployeeID], onUpdate: NoAction, map: "FK__Login__EmployeeI__4F7CD00D")
 }
 
@@ -69,12 +70,11 @@ model ResourceRequests {
   AcceptedAt        DateTime?
   UpdatedAt         DateTime?       @default(now(), map: "DF__ResourceR__Updat__47DBAE45")
   Feedback          String?         @db.NVarChar(Max)
-  Employee          Employee?       @relation(fields: [EmployeeID], references: [EmployeeID], onDelete: NoAction, onUpdate: NoAction, map: "FK__ResourceR__Emplo__48CFD27E")
   JobDescription    JobDescription? @relation(fields: [JobDescriptionID], references: [JobDescriptionID], onDelete: NoAction, onUpdate: NoAction, map: "FK__ResourceR__JobDe__49C3F6B7")
 }
 
 model Skills {
-  SkillID   Int    @id(map: "PK__Skills__DFA091E7DC3B500D")
+  SkillID   Int    @id(map: "PK_Skills") @default(autoincrement())
   SkillName String @db.VarChar(100)
 }
 
@@ -94,8 +94,38 @@ model UpdateTracker {
   LastUpdatedColumns                             String?         @db.NVarChar(Max)
   CreatedAt                                      DateTime?       @default(now(), map: "DF__UpdateTra__Creat__5441852A")
   UpdatedAt                                      DateTime?       @default(now(), map: "DF__UpdateTra__Updat__5535A963")
-  Employee_UpdateTracker_EmployeeIDToEmployee    Employee?       @relation("UpdateTracker_EmployeeIDToEmployee", fields: [EmployeeID], references: [EmployeeID], onDelete: NoAction, onUpdate: NoAction, map: "FK__UpdateTra__Emplo__571DF1D5")
   JobDescription                                 JobDescription? @relation(fields: [JobDescriptionID], references: [JobDescriptionID], onDelete: NoAction, onUpdate: NoAction, map: "FK__UpdateTra__JobDe__5629CD9C")
+  Employee_UpdateTracker_EmployeeIDToEmployee    Employee?       @relation("UpdateTracker_EmployeeIDToEmployee", fields: [EmployeeID], references: [EmployeeID], onDelete: NoAction, onUpdate: NoAction, map: "FK__UpdateTra__Emplo__571DF1D5")
   Employee_UpdateTracker_Level1PanelIDToEmployee Employee?       @relation("UpdateTracker_Level1PanelIDToEmployee", fields: [Level1PanelID], references: [EmployeeID], onDelete: NoAction, onUpdate: NoAction, map: "FK__UpdateTra__Level__5812160E")
   Employee_UpdateTracker_Level2PanelIDToEmployee Employee?       @relation("UpdateTracker_Level2PanelIDToEmployee", fields: [Level2PanelID], references: [EmployeeID], onDelete: NoAction, onUpdate: NoAction, map: "FK__UpdateTra__Level__59063A47")
+}
+
+model Education {
+  EducationID   Int    @id(map: "PK_Education") @default(autoincrement())
+  EducationName String @db.VarChar(100)
+}
+
+model InterviewSlots {
+  InterviewSlotID   Int    @id(map: "PK_InterviewSlots") @default(autoincrement())
+  InterviewSlotName String @db.VarChar(100)
+}
+
+model JobType {
+  JobTypeID   Int    @id(map: "PK_JobType") @default(autoincrement())
+  JobTypeName String @db.VarChar(100)
+}
+
+model ModeOfWork {
+  ModeOfWorkID   Int    @id(map: "PK_ModeOfWork") @default(autoincrement())
+  ModeOfWorkName String @db.VarChar(100)
+}
+
+model NoticePeriod {
+  NoticePeriodID   Int    @id(map: "PK_NoticePeriod") @default(autoincrement())
+  NoticePeriodName String @db.VarChar(100)
+}
+
+model Priority {
+  PriorityID   Int    @id(map: "PK_Priority") @default(autoincrement())
+  PriorityName String @db.VarChar(100)
 }
