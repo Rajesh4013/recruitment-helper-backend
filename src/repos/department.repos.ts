@@ -1,6 +1,5 @@
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { prisma } from '../utils/prisma.js';
+import { CreateDepartmentRequest, UpdateDepartmentRequest } from '../types/department.types.js';
 
 export const departmentRepository = {
     async getAllDepartments() {
@@ -21,5 +20,34 @@ export const departmentRepository = {
         });
 
         return department;
+    },
+
+    async createDepartment(data: CreateDepartmentRequest) {
+        const department = await prisma.department.create({
+            data: {
+                DepartmentName: data.departmentName
+            }
+        });
+        return department;
+    },
+
+    async updateDepartment(id: number, data: UpdateDepartmentRequest) {
+        const department = await prisma.department.update({
+            where: {
+                DepartmentID: id
+            },
+            data: {
+                DepartmentName: data.departmentName
+            }
+        });
+        return department;
+    },
+
+    async deleteDepartment(id: number) {
+        await prisma.department.delete({
+            where: {
+                DepartmentID: id
+            }
+        });
     }
 }; 
