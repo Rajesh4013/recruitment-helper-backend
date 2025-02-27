@@ -1,7 +1,5 @@
-import { PrismaClient } from '@prisma/client';
-import { EmployeeQueryParams } from '../types/employee.types';
-
-const prisma = new PrismaClient();
+import { prisma } from '../utils/prisma.js';
+import { EmployeeQueryParams } from '../types/employee.types.js';
 
 export const employeeRepository = {
     async getAllEmployees(params: EmployeeQueryParams) {
@@ -73,8 +71,7 @@ export const employeeRepository = {
                         EmployeeID: true,
                         FirstName: true,
                         LastName: true,
-                        Designation: true,
-                        Email: true
+                        Designation: true
                     }
                 }
             }
@@ -99,8 +96,7 @@ export const employeeRepository = {
                         EmployeeID: true,
                         FirstName: true,
                         LastName: true,
-                        Designation: true,
-                        Email: true
+                        Designation: true
                     }
                 }
             }

@@ -2,7 +2,6 @@ export interface Employee {
     EmployeeID: number;
     FirstName: string;
     LastName: string;
-    Email: string;
     Designation?: string | null;
     CreatedAt?: Date | null;
 }
@@ -16,7 +15,6 @@ export interface EmployeeDetails extends Employee {
         FirstName: string;
         LastName: string;
         Designation: string;
-        Email: string;
     } | null;
 }
 

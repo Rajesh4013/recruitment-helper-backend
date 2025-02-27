@@ -12,7 +12,6 @@ export const employeeService = {
                     EmployeeID: emp.EmployeeID,
                     FirstName: emp.FirstName,
                     LastName: emp.LastName,
-                    Email: emp.Email,
                     Designation: emp.Designation,
                     CreatedAt: emp.CreatedAt,
                     Department: emp.Department ? {
@@ -23,7 +22,6 @@ export const employeeService = {
                         FirstName: emp.Employee.FirstName,
                         LastName: emp.Employee.LastName,
                         Designation: emp.Employee.Designation!,
-                        Email: emp.Employee.Email
                     } : null
                 })),
                 message: 'Employees retrieved successfully',
@@ -56,7 +54,6 @@ export const employeeService = {
                     EmployeeID: employee.EmployeeID,
                     FirstName: employee.FirstName,
                     LastName: employee.LastName,
-                    Email: employee.Email,
                     Designation: employee.Designation,
                     CreatedAt: employee.CreatedAt,
                     Department: employee.Department ? {
@@ -67,7 +64,6 @@ export const employeeService = {
                         FirstName: employee.Employee.FirstName,
                         LastName: employee.Employee.LastName,
                         Designation: employee.Employee.Designation!,
-                        Email: employee.Employee.Email
                     } : null
                 },
                 message: 'Employee retrieved successfully'
