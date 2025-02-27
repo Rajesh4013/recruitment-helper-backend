@@ -1,7 +1,5 @@
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '../utils/prisma.js';
 import { SkillQueryParams } from '../types/skill.types.js';
-
-const prisma = new PrismaClient();
 
 export const skillRepository = {
     async getAllSkills(params: SkillQueryParams) {
@@ -43,5 +41,34 @@ export const skillRepository = {
         });
 
         return skill;
+    },
+
+    async createSkill(skillName: string) {
+        const skill = await prisma.skills.create({
+            data: {
+                SkillName: skillName
+            }
+        });
+        return skill;
+    },
+
+    async updateSkill(id: number, skillName: string) {
+        const skill = await prisma.skills.update({
+            where: {
+                SkillID: id
+            },
+            data: {
+                SkillName: skillName
+            }
+        });
+        return skill;
+    },
+
+    async deleteSkill(id: number) {
+        await prisma.skills.delete({
+            where: {
+                SkillID: id
+            }
+        });
     }
 }; 
