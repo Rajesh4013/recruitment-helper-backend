@@ -34,6 +34,11 @@ export interface Priority {
     PriorityName: string;
 }
 
+export interface BudgetRange {
+    BudgetID: number;
+    BudgetName: string;
+}
+
 export interface GetAllResponse<T> extends BaseLookup {
     data: T[];
 }

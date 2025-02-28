@@ -71,5 +71,18 @@ export const lookupRepository = {
         return await prisma.priority.findUnique({
             where: { PriorityID: id }
         });
+    },
+
+    // Budget Ranges
+    async getAllBudgetRanges() {
+        return await prisma.budgetRanges.findMany({
+            orderBy: { BudgetName: 'asc' }
+        });
+    },
+    
+    async getBudgetRangeById(id: number) {
+        return await prisma.budgetRanges.findUnique({
+            where: { BudgetID: id }
+        });
     }
 }; 

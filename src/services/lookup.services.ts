@@ -1,5 +1,5 @@
 import { lookupRepository } from '../repos/lookup.repos.js';
-import { GetAllResponse, GetByIdResponse, Education, InterviewSlot, JobType, ModeOfWork, NoticePeriod, Priority } from '../types/lookup.types.js';
+import { GetAllResponse, GetByIdResponse, Education, InterviewSlot, JobType, ModeOfWork, NoticePeriod, Priority, BudgetRange } from '../types/lookup.types.js';
 
 export const lookupService = {
     // Education
@@ -159,6 +159,33 @@ export const lookupService = {
                 success: !!data,
                 data,
                 message: data ? 'Priority retrieved successfully' : 'Priority not found'
+            };
+        } catch (error) {
+            throw error;
+        }
+    },
+
+    // Budget Ranges
+    async getAllBudgetRanges(): Promise<GetAllResponse<BudgetRange>> {
+        try {
+            const data = await lookupRepository.getAllBudgetRanges();
+            return {
+                success: true,
+                data,
+                message: 'Budget ranges retrieved successfully'
+            };
+        } catch (error) {
+            throw error;
+        }
+    },
+
+    async getBudgetRangeById(id: number): Promise<GetByIdResponse<BudgetRange>> {
+        try {
+            const data = await lookupRepository.getBudgetRangeById(id);
+            return {
+                success: !!data,
+                data,
+                message: data ? 'Budget range retrieved successfully' : 'Budget range not found'
             };
         } catch (error) {
             throw error;

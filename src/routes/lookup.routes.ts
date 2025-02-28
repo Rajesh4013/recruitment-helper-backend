@@ -245,4 +245,44 @@ router.get('/priorities/:id', authenticateToken, async (req: Request, res: Respo
     }
 });
 
+// Budget Ranges Routes
+router.get('/budget-ranges', authenticateToken, async (_req: Request, res: Response) => {
+    try {
+        const response = await lookupService.getAllBudgetRanges();
+        res.json(response);
+    } catch (error) {
+        const errorResponse: ApiErrorResponse = {
+            success: false,
+            message: 'Failed to fetch budget ranges',
+            error: error instanceof Error ? error.message : 'Unknown error occurred'
+        };
+        res.status(500).json(errorResponse);
+    }
+});
+
+router.get('/budget-ranges/:id', authenticateToken, async (req: Request, res: Response) => {
+    try {
+        const id = parseInt(req.params.id);
+        if (isNaN(id)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid ID format'
+            });
+        }
+
+        const response = await lookupService.getBudgetRangeById(id);
+        if (!response.success) {
+            return res.status(404).json(response);
+        }
+        res.json(response);
+    } catch (error) {
+        const errorResponse: ApiErrorResponse = {
+            success: false,
+            message: 'Failed to fetch budget range',
+            error: error instanceof Error ? error.message : 'Unknown error occurred'
+        };
+        res.status(500).json(errorResponse);
+    }
+});
+
 export default router; 
