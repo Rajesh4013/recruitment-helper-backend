@@ -4,10 +4,12 @@ export interface Employee {
     LastName: string;
     Designation?: string | null;
     CreatedAt?: Date | null;
+    Email?: string | null;
 }
 
 export interface EmployeeDetails extends Employee {
     Department?: {
+        DepartmentID: number;
         DepartmentName: string;
     } | null;
     Manager?: {

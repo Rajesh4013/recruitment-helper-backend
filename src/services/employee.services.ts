@@ -14,7 +14,9 @@ export const employeeService = {
                     LastName: emp.LastName,
                     Designation: emp.Designation,
                     CreatedAt: emp.CreatedAt,
+                    Email: emp.Login?.Email,
                     Department: emp.Department ? {
+                        DepartmentID: emp.Department.DepartmentID,
                         DepartmentName: emp.Department.DepartmentName
                     } : null,
                     Manager: emp.Employee ? {
@@ -57,6 +59,7 @@ export const employeeService = {
                     Designation: employee.Designation,
                     CreatedAt: employee.CreatedAt,
                     Department: employee.Department ? {
+                        DepartmentID: employee.Department.DepartmentID,
                         DepartmentName: employee.Department.DepartmentName
                     } : null,
                     Manager: employee.Employee ? {

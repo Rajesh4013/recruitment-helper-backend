@@ -16,40 +16,41 @@ export const employeeRepository = {
 
         const skip = (page - 1) * limit;
 
+        // Get employee IDs that match the employeeId search
+        const matchingEmployeeIds = employeeIdSearch ? 
+            await prisma.employee.findMany({
+                where: {
+                    EmployeeID: {
+                        in: await prisma.employee
+                            .findMany({
+                                where: { EmployeeID: { gt: 0 } },
+                                select: { EmployeeID: true }
+                            })
+                            .then(ids => 
+                                ids
+                                    .filter(e => e.EmployeeID.toString().includes(employeeIdSearch))
+                                    .map(e => e.EmployeeID)
+                            )
+                    }
+                },
+                select: { EmployeeID: true }
+            }).then(ids => ids.map(e => e.EmployeeID))
+            : undefined;
+
         const where = {
             AND: [
                 departmentId ? { DepartmentID: departmentId } : {},
                 designation ? { Designation: designation } : {},
-                employeeIdSearch ? {
-                    EmployeeID: {
-                        in: await prisma.employee.findMany({
-                            where: {
-                                EmployeeID: {
-                                    in: await prisma.employee
-                                        .findMany({
-                                            where: {
-                                                EmployeeID: {
-                                                    gt: 0
-                                                }
-                                            },
-                                            select: { EmployeeID: true }
-                                        })
-                                        .then(ids => 
-                                            ids
-                                                .filter(e => e.EmployeeID.toString().includes(employeeIdSearch))
-                                                .map(e => e.EmployeeID)
-                                        )
-                                }
-                            },
-                            select: { EmployeeID: true }
-                        }).then(ids => ids.map(e => e.EmployeeID))
-                    }
-                } : {},
+                employeeIdSearch ? { EmployeeID: { in: matchingEmployeeIds } } : {},
                 search ? {
                     OR: [
                         { FirstName: { contains: search } },
                         { LastName: { contains: search } },
-                        { Email: { contains: search } }
+                        {
+                            Login: {
+                                Email: { contains: search }
+                            }
+                        }
                     ]
                 } : {}
             ]
@@ -63,7 +64,13 @@ export const employeeRepository = {
             include: {
                 Department: {
                     select: {
+                        DepartmentID: true,
                         DepartmentName: true
+                    }
+                },
+                Login: {
+                    select: {
+                        Email: true
                     }
                 },
                 Employee: {
@@ -88,6 +95,7 @@ export const employeeRepository = {
             include: {
                 Department: {
                     select: {
+                        DepartmentID: true,
                         DepartmentName: true
                     }
                 },
