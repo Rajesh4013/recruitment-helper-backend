@@ -1,5 +1,11 @@
 import { PrismaClient } from '@prisma/client';
 
-const prisma = new PrismaClient();
+const prisma = new PrismaClient({
+    datasourceUrl: process.env.DATABASE_URL
+});
 
-export { prisma }; 
+process.on('beforeExit', async () => {
+    await prisma.$disconnect();
+});
+
+export { prisma };
