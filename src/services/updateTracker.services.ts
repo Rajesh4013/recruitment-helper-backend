@@ -1,12 +1,15 @@
 import { UpdateTrackerRepository } from '../repos/updateTracker.repos.js';
+import { InterviewSlotRepository } from '../repos/interviewSlot.repos.js';
 import { Prisma } from '@prisma/client';
 import { CreateUpdateTracker } from '../types/requests.types.js';
 
 class UpdateTrackerService {
     private repository: UpdateTrackerRepository;
+    private interviewSlotRepository: InterviewSlotRepository;
 
     constructor() {
         this.repository = new UpdateTrackerRepository();
+        this.interviewSlotRepository = new InterviewSlotRepository();
     }
 
     async createUpdateTracker(id: number, data: CreateUpdateTracker) {
@@ -51,6 +54,25 @@ class UpdateTrackerService {
         };
         // console.log(updateTracker);
         return this.repository.createUpdateTracker(updateTracker);
+    }
+
+    async getUpdateTrackersByJobDescriptionId(jobDescriptionId: number) {
+        const updateTrackers = await this.repository.getUpdateTrackerByJobDescriptionId(jobDescriptionId);
+
+        for (const tracker of updateTrackers) {
+            if (tracker.Level1PanelInterviewSlots) {
+                const slotIds = tracker.Level1PanelInterviewSlots.split(',').map(Number);
+                const slots = await this.interviewSlotRepository.getInterviewSlotNamesByIds(slotIds);
+                tracker.Level1PanelInterviewSlots = slots.map(slot => slot.InterviewSlotName).join(', ');
+            }
+            if (tracker.Level2PanelInterviewSlots) {
+                const slotIds = tracker.Level2PanelInterviewSlots.split(',').map(Number);
+                const slots = await this.interviewSlotRepository.getInterviewSlotNamesByIds(slotIds);
+                tracker.Level2PanelInterviewSlots = slots.map(slot => slot.InterviewSlotName).join(', ');
+            }
+        }
+
+        return updateTrackers;
     }
 }
 

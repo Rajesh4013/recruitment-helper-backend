@@ -9,4 +9,24 @@ export class JobDescriptionRepository {
             data,
         });
     }
+
+    async getJobDescriptionById(jobDescriptionId: number) {
+        return prisma.jobDescription.findUnique({
+            where: { JobDescriptionID: jobDescriptionId },
+            include: {
+                ModeOfWork: {
+                    select: { ModeOfWorkName: true }
+                },
+                Education: {
+                    select: { EducationName: true }
+                },
+                JobType: {
+                    select: { JobTypeName: true }
+                },
+                NoticePeriod: {
+                    select: { NoticePeriodName: true }
+                }
+            }
+        });
+    }
 }

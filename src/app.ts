@@ -7,6 +7,7 @@ import departmentRoutes from './routes/department.routes.js';
 import skillRoutes from './routes/skill.routes.js';
 import lookupRoutes from './routes/lookup.routes.js';
 import jobDescriptionRoutes from './routes/jobDescription.routes.js';
+import resourceRequestsRoutes from './routes/resourceRequest.routes.js';
 
 dotenv.config();
 
@@ -28,7 +29,8 @@ app.use('/api/employees', employeeRoutes);
 app.use('/api/departments', departmentRoutes);
 app.use('/api/skills', skillRoutes);
 app.use('/api/lookups', lookupRoutes);
-app.use('/api/', jobDescriptionRoutes);
+app.use('/api', jobDescriptionRoutes);
+app.use('/api', resourceRequestsRoutes)
 
 app.get('/', (req, res) => {
     res.json({ message: 'Welcome to Recruitment Helper API' });
