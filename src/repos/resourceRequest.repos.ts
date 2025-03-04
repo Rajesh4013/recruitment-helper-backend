@@ -4,6 +4,13 @@ const prisma = new PrismaClient();
 
 export class ResourceRequestRepository {
 
+    async getJobDescriptionIdByResourceRequestId(requestId: number) {
+        return prisma.resourceRequests.findUnique({
+            where: { ResourceRequestID: requestId },
+            select: { JobDescriptionID: true }
+        });
+    }
+
     async createResourceRequest(data: Prisma.ResourceRequestsCreateInput) {
         console.log('ResourceRequestRepository.createResourceRequest data:', data);
         return prisma.resourceRequests.create({

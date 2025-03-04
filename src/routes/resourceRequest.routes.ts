@@ -1,5 +1,6 @@
 import express from 'express';
 import resourceRequestServices from '../services/resourceRequest.services.js';
+import { AuthenticatedRequest } from '../types/auth.types.js';
 
 const router = express.Router();
 
@@ -39,9 +40,12 @@ router.get('/resource-request/:requestId', async (req, res) => {
 
 router.put('/resource-request/:requestId', async (req, res) => {
     try {
+        console.log(req);
         const requestId = parseInt(req.params.requestId);
+        const employeeId = (req as AuthenticatedRequest).user?.employeeId ?? 0;
+        // console.log(employeeId);
         const data = req.body;
-        const updatedResourceRequest = await resourceRequestServices.updateResourceRequest(requestId, data);
+        const updatedResourceRequest = await resourceRequestServices.updateResourceRequest(requestId, employeeId, data);
         res.status(200).json({
             success: true,
             data: updatedResourceRequest,
