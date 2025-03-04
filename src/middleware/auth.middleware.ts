@@ -24,6 +24,9 @@ export const authenticateToken = (
     try {
         const decoded = jwt.verify(token, JWT_SECRET) as JwtPayload;
         (req as AuthenticatedRequest).user = decoded;
+        // console.log("--------------------------");
+        // console.log((req as AuthenticatedRequest).user?.employeeId);
+        // console.log("--------------------------");
         next();
     } catch (error) {
         const errorResponse: ApiErrorResponse = {

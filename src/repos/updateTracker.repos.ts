@@ -27,9 +27,18 @@ export class UpdateTrackerRepository {
         });
     }
 
-    async updateUpdateTracker(id: number, data: Prisma.UpdateTrackerUpdateInput) {
+    async getUpdateTrackerIdByJobDescriptionId(jobDescriptionId: number) {
+        return prisma.updateTracker.findFirst({
+            where: { JobDescriptionID: jobDescriptionId },
+            select: {
+                UpdateTrackerID: true
+            }
+        });
+    }
+
+    async updateUpdateTracker(jobDescriptionId: number, employeeId: number, data: Prisma.UpdateTrackerUpdateInput) {
         return prisma.updateTracker.update({
-            where: { UpdateTrackerID: id },
+            where: { EmployeeID_JobDescriptionID: { JobDescriptionID: jobDescriptionId, EmployeeID: employeeId } },
             data
         });
     }

@@ -14,7 +14,11 @@ class UpdateTrackerService {
 
     async createUpdateTracker(id: number, data: CreateUpdateTracker) {
         const updateTracker: Prisma.UpdateTrackerCreateInput = {
-            JobDescriptionID: id,
+            JobDescription: {
+                connect: {
+                    JobDescriptionID: id
+                }
+            },
             Employee_UpdateTracker_EmployeeIDToEmployee: {
                 connect: {
                     EmployeeID: data.employeeID
@@ -53,8 +57,39 @@ class UpdateTrackerService {
         return this.repository.createUpdateTracker(updateTracker);
     }
 
-    async updateUpdateTracker(id: number, data: Prisma.UpdateTrackerUpdateInput) {
-        return this.repository.updateUpdateTracker(id, data);
+    async updateUpdateTracker(jobDescriptionId: number, employeeId: number, data: any) {
+        const updateTrackerData: Prisma.UpdateTrackerUpdateInput = {
+            ExpectedTimeline: data.ExpectedTimeline ? data.ExpectedTimeline : undefined,
+            Level1PanelInterviewSlots: data.Level1PanelInterviewSlots ? data.Level1PanelInterviewSlots : undefined,
+            Level2PanelInterviewSlots: data.Level2PanelInterviewSlots ? data.Level2PanelInterviewSlots : undefined,
+            Status: data.Status ? data.Status : undefined,
+            Comments: data.Comments ? data.Comments : undefined,
+            Priority: data.Priority ? {
+                connect: {
+                    PriorityID: parseInt(data.Priority)
+                }
+            } : undefined,
+            BudgetRanges: data.Budget ? {
+                connect: {
+                    BudgetID: parseInt(data.Budget)
+                }
+            } : undefined,
+            Employee_UpdateTracker_Level1PanelIDToEmployee: data.Level1PanelInterview
+                ? {
+                    connect: {
+                        EmployeeID: parseInt(data.Level1PanelInterview)
+                    }
+                }
+                : undefined,
+            Employee_UpdateTracker_Level2PanelIDToEmployee: data.Level2PanelInterview
+                ? {
+                    connect: {
+                        EmployeeID: parseInt(data.Level2PanelInterview)
+                    }
+                }
+                : undefined
+        }
+        return this.repository.updateUpdateTracker(jobDescriptionId, employeeId, updateTrackerData);
     }
 
     async getUpdateTrackersByJobDescriptionId(jobDescriptionId: number) {
