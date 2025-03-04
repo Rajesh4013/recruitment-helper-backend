@@ -27,6 +27,13 @@ export class UpdateTrackerRepository {
         });
     }
 
+    async updateUpdateTracker(id: number, data: Prisma.UpdateTrackerUpdateInput) {
+        return prisma.updateTracker.update({
+            where: { UpdateTrackerID: id },
+            data
+        });
+    }
+
     // async getUpdateTrackersByJobDescriptionId(jobDescriptionId: number) {
     //     return prisma.updateTracker.findMany({
     //         where: { JobDescriptionID: jobDescriptionId },

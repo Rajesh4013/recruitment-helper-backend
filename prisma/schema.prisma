@@ -97,7 +97,7 @@ model UpdateTracker {
   Status                                         String?      @default("InProgress", map: "DF_UpdateTracker_Status") @db.VarChar(20)
   LastUpdatedColumns                             String?      @db.NVarChar(Max)
   CreatedAt                                      DateTime?    @default(now(), map: "DF__UpdateTra__Creat__5441852A")
-  UpdatedAt                                      DateTime?    @default(now(), map: "DF__UpdateTra__Updat__5535A963")
+  UpdatedAt                                      DateTime?    @updatedAt @map("DF__UpdateTra__Updat__5535A963")
   PriorityID                                     Int?
   BudgetID                                       Int
   BudgetRanges                                   BudgetRanges @relation(fields: [BudgetID], references: [BudgetID], onUpdate: NoAction, map: "FK_UpdateTra_Budget")

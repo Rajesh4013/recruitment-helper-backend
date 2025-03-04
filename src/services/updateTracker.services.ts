@@ -56,19 +56,31 @@ class UpdateTrackerService {
         return this.repository.createUpdateTracker(updateTracker);
     }
 
+    async updateUpdateTracker(id: number, data: Prisma.UpdateTrackerUpdateInput) {
+        return this.repository.updateUpdateTracker(id, data);
+    }
+
     async getUpdateTrackersByJobDescriptionId(jobDescriptionId: number) {
         const updateTrackers = await this.repository.getUpdateTrackerByJobDescriptionId(jobDescriptionId);
 
         for (const tracker of updateTrackers) {
             if (tracker.Level1PanelInterviewSlots) {
-                const slotIds = tracker.Level1PanelInterviewSlots.split(',').map(Number);
-                const slots = await this.interviewSlotRepository.getInterviewSlotNamesByIds(slotIds);
-                tracker.Level1PanelInterviewSlots = slots.map(slot => slot.InterviewSlotName).join(', ');
+                const slotIds = tracker.Level1PanelInterviewSlots.split(',').map(Number).filter(id => !isNaN(id));
+                if (slotIds.length > 0) {
+                    const slots = await this.interviewSlotRepository.getInterviewSlotNamesByIds(slotIds);
+                    tracker.Level1PanelInterviewSlots = slots.map(slot => slot.InterviewSlotName).join(', ');
+                } else {
+                    tracker.Level1PanelInterviewSlots = '';
+                }
             }
             if (tracker.Level2PanelInterviewSlots) {
-                const slotIds = tracker.Level2PanelInterviewSlots.split(',').map(Number);
-                const slots = await this.interviewSlotRepository.getInterviewSlotNamesByIds(slotIds);
-                tracker.Level2PanelInterviewSlots = slots.map(slot => slot.InterviewSlotName).join(', ');
+                const slotIds = tracker.Level2PanelInterviewSlots.split(',').map(Number).filter(id => !isNaN(id));
+                if (slotIds.length > 0) {
+                    const slots = await this.interviewSlotRepository.getInterviewSlotNamesByIds(slotIds);
+                    tracker.Level2PanelInterviewSlots = slots.map(slot => slot.InterviewSlotName).join(', ');
+                } else {
+                    tracker.Level2PanelInterviewSlots = '';
+                }
             }
         }
 

@@ -190,5 +190,68 @@ export const lookupService = {
         } catch (error) {
             throw error;
         }
+    },
+
+    async addLookup(type: string, data: any) {
+        switch (type) {
+            case 'education':
+                return lookupRepository.addEducation(data);
+            case 'interview-slot':
+                return lookupRepository.addInterviewSlot(data);
+            case 'job-type':
+                return lookupRepository.addJobType(data);
+            case 'modes-of-work':
+                return lookupRepository.addModeOfWork(data);
+            case 'notice-period':
+                return lookupRepository.addNoticePeriod(data);
+            case 'priority':
+                return lookupRepository.addPriority(data);
+            case 'budget-range':
+                return lookupRepository.addBudgetRange(data);
+            default:
+                throw new Error('Invalid lookup type');
+        }
+    },
+
+    async updateLookup(type: string, id: number, data: any) {
+        switch (type) {
+            case 'education':
+                return lookupRepository.updateEducation(id, data);
+            case 'interview-slot':
+                return lookupRepository.updateInterviewSlot(id, data);
+            case 'job-type':
+                return lookupRepository.updateJobType(id, data);
+            case 'modes-of-work':
+                return lookupRepository.updateModeOfWork(id, data);
+            case 'notice-period':
+                return lookupRepository.updateNoticePeriod(id, data);
+            case 'priority':
+                return lookupRepository.updatePriority(id, data);
+            case 'budget-range':
+                return lookupRepository.updateBudgetRange(id, data);
+            default:
+                throw new Error('Invalid lookup type');
+        }
+    },
+
+    async deleteLookup(type: string, id: number) {
+        switch (type) {
+            case 'education':
+                return lookupRepository.deleteEducation(id);
+            case 'interview-slot':
+                return lookupRepository.deleteInterviewSlot(id);
+            case 'job-type':
+                return lookupRepository.deleteJobType(id);
+            case 'modes-of-work':
+                return lookupRepository.deleteModeOfWork(id);
+            case 'notice-period':
+                return lookupRepository.deleteNoticePeriod(id);
+            case 'priority':
+                return lookupRepository.deletePriority(id);
+            case 'budget-range':
+                return lookupRepository.deleteBudgetRange(id);
+            default:
+                throw new Error('Invalid lookup type');
+        }
     }
-}; 
+};

@@ -44,13 +44,27 @@ export class ResourceRequestRepository {
             include: {
                 JobDescription: {
                     include: {
-                        ModeOfWork: true,
-                        Education: true,
-                        JobType: true,
-                        NoticePeriod: true,
+                        ModeOfWork: {
+                            select: { ModeOfWorkName: true }
+                        },
+                        Education: {
+                            select: { EducationName: true }
+                        },
+                        JobType: {
+                            select: { JobTypeName: true }
+                        },
+                        NoticePeriod: {
+                            select: { NoticePeriodName: true }
+                        }
                     }
                 },
-                Employee: true,
+                Employee: {
+                    include: {
+                        Department: {
+                            select: { DepartmentName: true }
+                        }
+                    }
+                }
             }
         });
     }

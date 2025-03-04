@@ -52,7 +52,6 @@ class JobDescriptionService {
             const resourceRequests = await resourceRequestServices.getResourceRequestsByJobDescriptionId(jobDescriptionId);
             const updateTrackers = await updateTrackerServices.getUpdateTrackersByJobDescriptionId(jobDescriptionId);
 
-            // Extract unique employee details
             const employees = new Map();
             resourceRequests.forEach(request => {
                 employees.set(request.Employee.EmployeeID, request.Employee);
@@ -69,7 +68,6 @@ class JobDescriptionService {
                 }
             });
 
-            // Refactor response structure
             const response = {
                 jobDescription: {
                     ...jobDescription,

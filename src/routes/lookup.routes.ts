@@ -285,4 +285,65 @@ router.get('/budget-ranges/:id', authenticateToken, async (req: Request, res: Re
     }
 });
 
-export default router; 
+// Add Lookup
+router.post('/:type', authenticateToken, async (req: Request, res: Response) => {
+    try {
+        const type = req.params.type;
+        const data = req.body;
+        const response = await lookupService.addLookup(type, data);
+        res.status(201).json({
+            success: true,
+            data: response,
+        });
+    } catch (error) {
+        const errorResponse: ApiErrorResponse = {
+            success: false,
+            message: 'Failed to add lookup',
+            error: error instanceof Error ? error.message : 'Unknown error occurred'
+        };
+        res.status(500).json(errorResponse);
+    }
+});
+
+// Update Lookup
+router.put('/:type/:id', authenticateToken, async (req: Request, res: Response) => {
+    try {
+        const type = req.params.type;
+        const id = parseInt(req.params.id);
+        const data = req.body;
+        const response = await lookupService.updateLookup(type, id, data);
+        res.status(200).json({
+            success: true,
+            data: response,
+        });
+    } catch (error) {
+        const errorResponse: ApiErrorResponse = {
+            success: false,
+            message: 'Failed to update lookup',
+            error: error instanceof Error ? error.message : 'Unknown error occurred'
+        };
+        res.status(500).json(errorResponse);
+    }
+});
+
+// Delete Lookup
+router.delete('/:type/:id', authenticateToken, async (req: Request, res: Response) => {
+    try {
+        const type = req.params.type;
+        const id = parseInt(req.params.id);
+        await lookupService.deleteLookup(type, id);
+        res.status(200).json({
+            success: true,
+            message: 'Lookup deleted successfully',
+        });
+    } catch (error) {
+        const errorResponse: ApiErrorResponse = {
+            success: false,
+            message: 'Failed to delete lookup',
+            error: error instanceof Error ? error.message : 'Unknown error occurred'
+        };
+        res.status(500).json(errorResponse);
+    }
+});
+
+export default router;
