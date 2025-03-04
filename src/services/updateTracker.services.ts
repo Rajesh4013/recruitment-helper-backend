@@ -13,8 +13,6 @@ class UpdateTrackerService {
     }
 
     async createUpdateTracker(id: number, data: CreateUpdateTracker) {
-        // console.log(data);
-        // console.log(data.level2PanelInterviewSlots);
         const updateTracker: Prisma.UpdateTrackerCreateInput = {
             JobDescriptionID: id,
             Employee_UpdateTracker_EmployeeIDToEmployee: {
@@ -52,7 +50,6 @@ class UpdateTrackerService {
             Level2PanelInterviewSlots: data.level2PanelInterviewSlots,
             Level1PanelInterviewSlots: data.level1PanelInterviewSlots,
         };
-        // console.log(updateTracker);
         return this.repository.createUpdateTracker(updateTracker);
     }
 
@@ -66,20 +63,23 @@ class UpdateTrackerService {
         for (const tracker of updateTrackers) {
             if (tracker.Level1PanelInterviewSlots) {
                 const slotIds = tracker.Level1PanelInterviewSlots.split(',').map(Number).filter(id => !isNaN(id));
+                console.log(slotIds);
                 if (slotIds.length > 0) {
                     const slots = await this.interviewSlotRepository.getInterviewSlotNamesByIds(slotIds);
-                    tracker.Level1PanelInterviewSlots = slots.map(slot => slot.InterviewSlotName).join(', ');
+                    console.log(slots);
+                    tracker.Level1PanelInterviewSlots = JSON.stringify(slotIds.map((id, index) => ({ id, name: slots[index].InterviewSlotName })));
+                    console.log(tracker.Level1PanelInterviewSlots);
                 } else {
-                    tracker.Level1PanelInterviewSlots = '';
+                    tracker.Level1PanelInterviewSlots = JSON.stringify([]);
                 }
             }
             if (tracker.Level2PanelInterviewSlots) {
                 const slotIds = tracker.Level2PanelInterviewSlots.split(',').map(Number).filter(id => !isNaN(id));
                 if (slotIds.length > 0) {
                     const slots = await this.interviewSlotRepository.getInterviewSlotNamesByIds(slotIds);
-                    tracker.Level2PanelInterviewSlots = slots.map(slot => slot.InterviewSlotName).join(', ');
+                    tracker.Level2PanelInterviewSlots = JSON.stringify(slotIds.map((id, index) => ({ id, name: slots[index].InterviewSlotName })));
                 } else {
-                    tracker.Level2PanelInterviewSlots = '';
+                    tracker.Level2PanelInterviewSlots = JSON.stringify([]);
                 }
             }
         }

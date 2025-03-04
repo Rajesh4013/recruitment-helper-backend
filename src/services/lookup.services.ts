@@ -204,7 +204,7 @@ export const lookupService = {
                 return lookupRepository.addModeOfWork(data);
             case 'notice-period':
                 return lookupRepository.addNoticePeriod(data);
-            case 'priority':
+            case 'priorities':
                 return lookupRepository.addPriority(data);
             case 'budget-range':
                 return lookupRepository.addBudgetRange(data);
@@ -225,7 +225,7 @@ export const lookupService = {
                 return lookupRepository.updateModeOfWork(id, data);
             case 'notice-period':
                 return lookupRepository.updateNoticePeriod(id, data);
-            case 'priority':
+            case 'priorities':
                 return lookupRepository.updatePriority(id, data);
             case 'budget-range':
                 return lookupRepository.updateBudgetRange(id, data);
@@ -246,7 +246,7 @@ export const lookupService = {
                 return lookupRepository.deleteModeOfWork(id);
             case 'notice-period':
                 return lookupRepository.deleteNoticePeriod(id);
-            case 'priority':
+            case 'priorities':
                 return lookupRepository.deletePriority(id);
             case 'budget-range':
                 return lookupRepository.deleteBudgetRange(id);

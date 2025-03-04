@@ -33,17 +33,4 @@ export class UpdateTrackerRepository {
             data
         });
     }
-
-    // async getUpdateTrackersByJobDescriptionId(jobDescriptionId: number) {
-    //     return prisma.updateTracker.findMany({
-    //         where: { JobDescriptionID: jobDescriptionId },
-    //         include: {
-    //             Employee_UpdateTracker_EmployeeIDToEmployee: true,
-    //             Employee_UpdateTracker_Level1PanelIDToEmployee: true,
-    //             Employee_UpdateTracker_Level2PanelIDToEmployee: true,
-    //             BudgetRanges: true,
-    //             Priority: true,
-    //         }
-    //     });
-    // }
 }
