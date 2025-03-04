@@ -66,21 +66,22 @@ router.post('/job-description', async (req, res) => {
     }
 });
 
-router.get('/job-description/:jobDescriptionId', async (req, res) => {
-    try {
-        const jobDescriptionId = parseInt(req.params.jobDescriptionId);
-        const jobDescriptionDetails = await jobDescriptionServices.getJobDescriptionDetails(jobDescriptionId);
-        res.status(200).json({
-            success: true,
-            data: jobDescriptionDetails,
-        });
-    } catch (error) {
-        console.error('Error fetching job description details:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Failed to fetch job description details',
-        });
-    }
-});
+// router.get('/resource-request/:resourceRequestId', async (req, res) => {
+//     try {
+//         const resourceRequestId = parseInt(req.params.resourceRequestId);
+//         const ids = await resourceRequestServices.getIdsByResourceRequestId(resourceRequestId);
+//         const jobDescriptionDetails = await jobDescriptionServices.getJobDescriptionDetails(ids.jobDescriptionID ?? 0);
+//         res.status(200).json({
+//             success: true,
+//             data: jobDescriptionDetails,
+//         });
+//     } catch (error) {
+//         console.error('Error fetching job description details:', error);
+//         res.status(500).json({
+//             success: false,
+//             message: 'Failed to fetch job description details',
+//         });
+//     }
+// });
 
 export default router;
