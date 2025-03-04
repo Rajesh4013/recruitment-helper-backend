@@ -9,6 +9,7 @@ import lookupRoutes from './routes/lookup.routes.js';
 import jobDescriptionRoutes from './routes/jobDescription.routes.js';
 import resourceRequestsRoutes from './routes/resourceRequest.routes.js';
 import updateTrackerRoutes from './routes/updateTracker.routes.js';
+import { authenticateToken } from './middleware/auth.middleware.js';
 
 dotenv.config();
 
@@ -26,6 +27,7 @@ app.use((req, res, next) => {
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use(authenticateToken);
 app.use('/api/employees', employeeRoutes);
 app.use('/api/departments', departmentRoutes);
 app.use('/api/skills', skillRoutes);
