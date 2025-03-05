@@ -28,7 +28,11 @@ export class ResourceRequestRepository {
 
     async getResourceRequestsByEmployeeId(employeeId: number, role: string, departmentId: number) {
         if (role === 'Recruiter' || role === 'Admin') {
-            return prisma.resourceRequests.findMany();
+            return prisma.resourceRequests.findMany({
+                include: {
+                    Employee: true
+                }
+            });
         } else if (role === 'Manager') {
             return prisma.resourceRequests.findMany({
                 where: {

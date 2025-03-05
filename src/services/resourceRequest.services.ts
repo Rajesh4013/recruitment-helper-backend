@@ -62,6 +62,10 @@ class ResourceRequestService {
         return this.repository.getResourceRequestsByJobDescriptionId(jobDescriptionId);
     }
 
+    async updateResourceRequestById(requestId: number, data: Prisma.ResourceRequestsUpdateInput) {
+        return this.repository.updateResourceRequest(requestId, data);
+    }
+
     async updateResourceRequest(requestId: number, employeeId: number, data: any) {
         // console.log(data);
         const ids = await this.getIdsByResourceRequestId(requestId);

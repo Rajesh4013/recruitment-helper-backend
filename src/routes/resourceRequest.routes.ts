@@ -59,6 +59,26 @@ router.put('/resource-request/:requestId', async (req, res) => {
     }
 });
 
+router.put('/resource-requests/:requestId', async (req, res) => {
+    try {
+        console.log(req);
+        const requestId = parseInt(req.params.requestId);
+        // const employeeId = (req as AuthenticatedRequest).user?.employeeId ?? 0;
+        const data = req.body;
+        const updatedResourceRequest = await resourceRequestServices.updateResourceRequestById(requestId, data);
+        res.status(200).json({
+            success: true,
+            data: updatedResourceRequest,
+        });
+    } catch (error) {
+        console.error('Error updating resource request:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to update resource request',
+        });
+    }
+});
+
 router.delete('/resource-request/:requestId', async (req, res) => {
     try {
         const requestId = parseInt(req.params.requestId);

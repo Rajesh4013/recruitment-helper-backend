@@ -57,8 +57,9 @@ router.post('/job-description', async (req, res) => {
         const hrEmails = await employeeServices.getHREmails();
 
         // Send emails
-        const emailText = formatEmailBody(resourceRequestResponse.ResourceRequestID, jobDescription, resourceRequest, updateTracker, (req as AuthenticatedRequest).user?.name || 'Unknown User');
-        await emailServices.sendEmail(managerEmails, hrEmails, resourceRequest.requestTitle, await emailText);
+        // const emailText = formatEmailBody(resourceRequestResponse.ResourceRequestID, jobDescription, resourceRequest, updateTracker, (req as AuthenticatedRequest).user?.name || 'Unknown User');
+        const emailText = formatEmailBody(jobDescription, resourceRequest, updateTracker, (req as AuthenticatedRequest).user?.name || 'Unknown User');
+        await emailServices.sendEmail(managerEmails, hrEmails, resourceRequest.requestTitle, emailText);
 
         res.status(201).json({
             success: true,
