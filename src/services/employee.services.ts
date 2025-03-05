@@ -1,11 +1,57 @@
 import { employeeRepository } from '../repos/employee.repos.js';
 import { EmployeeQueryParams, GetEmployeesResponse, GetEmployeeResponse } from '../types/employee.types.js';
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
+
+class EmployeeService {
+    async getManagerHierarchy(employeeId: number) {
+        const managers = [];
+        let currentEmployeeId = employeeId;
+
+        while (currentEmployeeId) {
+            const employee = await prisma.employee.findUnique({
+                where: { EmployeeID: currentEmployeeId },
+                select: { ManagerEmployeeID: true }
+            });
+
+            if (employee && employee.ManagerEmployeeID) {
+                managers.push(employee.ManagerEmployeeID);
+                currentEmployeeId = employee.ManagerEmployeeID;
+            } else {
+                break;
+            }
+        }
+
+        return managers;
+    }
+
+    async getEmailsByEmployeeIds(employeeIds: number[]) {
+        const logins = await prisma.login.findMany({
+            where: { EmployeeID: { in: employeeIds } },
+            select: { Email: true }
+        });
+
+        return logins.map(login => login.Email);
+    }
+
+    async getHREmails() {
+        const hrLogins = await prisma.login.findMany({
+            where: { Role: 'Recruiter' },
+            select: { Email: true }
+        });
+
+        return hrLogins.map(login => login.Email);
+    }
+}
+
+export default new EmployeeService();
 
 export const employeeService = {
     async getAllEmployees(params: EmployeeQueryParams): Promise<GetEmployeesResponse> {
         try {
             const { employees, total } = await employeeRepository.getAllEmployees(params);
-            
+
             return {
                 success: true,
                 data: employees.map(emp => ({
@@ -41,7 +87,7 @@ export const employeeService = {
     async getEmployeeById(id: number): Promise<GetEmployeeResponse> {
         try {
             const employee = await employeeRepository.getEmployeeById(id);
-            
+
             if (!employee) {
                 return {
                     success: false,

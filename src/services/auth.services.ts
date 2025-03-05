@@ -26,6 +26,7 @@ export const authService = {
             }
 
             const payload: JwtPayload = {
+                name: `${login.Employee.FirstName} ${login.Employee.LastName}`,
                 employeeId: login.EmployeeID,
                 email: login.Email,
                 role: login.Role as UserRole
