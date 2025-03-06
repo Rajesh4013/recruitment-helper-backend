@@ -14,7 +14,7 @@ model Department {
 }
 
 model Employee {
-  id                                                  String             @id(map: "PK_Employee") @default("left(replace(CONVERT([varchar](36),newid()),'-','),(8))", map: "DF__Employee__id__76619304") @db.Char(8)
+  id                                                  String             @id(map: "PK_Employee") @default("newid()", map: "DF__Employee__id__0B5CAFEA") @db.Char(8)
   EmployeeID                                          Int                @unique(map: "UQ_Employee_EmployeeID")
   FirstName                                           String             @db.VarChar(100)
   LastName                                            String             @db.VarChar(100)
@@ -24,6 +24,12 @@ model Employee {
   IsAdmin                                             Boolean            @default(false, map: "DF__Employee__IsAdmi__778AC167")
   CreatedAt                                           DateTime?          @default(now(), map: "DF__Employee__Create__787EE5A0")
   EmployeeI                                           Int?
+  ProfilePicture                                      Bytes?
+  MobileNumber                                        String             @default("", map: "DF_Employee_MobileNumber") @db.VarChar(50)
+  Address                                             String             @default("", map: "DF_Employee_Address") @db.VarChar(255)
+  Gender                                              String             @default("", map: "DF_Employee_Gender") @db.VarChar(10)
+  YearsOfExperience                                   Int?
+  JoiningDate                                         DateTime?
   Department                                          Department         @relation(fields: [DepartmentID], references: [DepartmentID], onUpdate: NoAction, map: "FK__Employee__Depart__3B75D760")
   Employee                                            Employee?          @relation("EmployeeToEmployee", fields: [ManagerEmployeeID], references: [EmployeeID], onDelete: NoAction, onUpdate: NoAction, map: "FK__Employee__Manage__3C69FB99")
   other_Employee                                      Employee[]         @relation("EmployeeToEmployee")
@@ -58,7 +64,7 @@ model JobDescription {
 }
 
 model Login {
-  id           String    @id(map: "PK_Login") @default("left(replace(CONVERT([varchar](36),newid()),'-','),(8))", map: "DF__Login__id__7755B73D") @db.Char(8)
+  id           String    @id(map: "PK_Login") @default("newid()", map: "DF__Login__id__0A688BB1") @db.Char(8)
   EmployeeID   Int       @unique(map: "UQ_Login_EmployeeID")
   Email        String    @unique(map: "UQ_Login_Email") @db.VarChar(150)
   PasswordHash String    @db.VarChar(255)
