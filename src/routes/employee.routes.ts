@@ -1,7 +1,7 @@
 import express, { Request, Response } from 'express';
 import { employeeService } from '../services/employee.services.js';
 import { ApiErrorResponse, EmployeeQueryParams } from '../types/employee.types.js';
-import { authenticateToken } from '../middleware/auth.middleware.js';
+import { authenticateToken, authorizeRoles } from '../middleware/auth.middleware.js';
 
 const router = express.Router();
 
@@ -15,7 +15,8 @@ router.get('/', authenticateToken, async (req: Request, res: Response) => {
             departmentId: req.query.departmentId ? parseInt(req.query.departmentId as string) : undefined,
             designation: req.query.designation as string,
             sortBy: req.query.sortBy as keyof EmployeeQueryParams['sortBy'],
-            sortOrder: req.query.sortOrder as 'asc' | 'desc'
+            sortOrder: req.query.sortOrder as 'asc' | 'desc',
+            searchBy: req.query.searchBy as string
         };
 
         const response = await employeeService.getAllEmployees(queryParams);
@@ -33,7 +34,7 @@ router.get('/', authenticateToken, async (req: Request, res: Response) => {
 router.get('/:id', authenticateToken, async (req, res) => {
     try {
         const employeeId = parseInt(req.params.id);
-        
+
         if (isNaN(employeeId)) {
             const errorResponse: ApiErrorResponse = {
                 success: false,
@@ -44,7 +45,7 @@ router.get('/:id', authenticateToken, async (req, res) => {
         }
 
         const response = await employeeService.getEmployeeById(employeeId);
-        
+
         if (!response.success) {
             return res.status(404).json(response);
         }
@@ -54,6 +55,49 @@ router.get('/:id', authenticateToken, async (req, res) => {
         const errorResponse: ApiErrorResponse = {
             success: false,
             message: 'Failed to fetch employee',
+            error: error instanceof Error ? error.message : 'Unknown error occurred'
+        };
+        res.status(500).json(errorResponse);
+    }
+});
+
+router.get('/profile/:id', authenticateToken, async (req, res) => {
+    try {
+        const employeeId = parseInt(req.params.id);
+
+        if (isNaN(employeeId)) {
+            const errorResponse: ApiErrorResponse = {
+                success: false,
+                message: 'Invalid employee ID',
+                error: 'ID must be a number'
+            };
+            return res.status(400).json(errorResponse);
+        }
+        const response = await employeeService.getEmployeeProfileByID(employeeId);
+
+        if (!response) {
+            return res.status(404).json(response);
+        }
+        res.json(response);
+    }
+    catch (error) {
+        const errorResponse: ApiErrorResponse = {
+            success: false,
+            message: 'Failed to fetch employee profile',
+            error: error instanceof Error ? error.message : 'Unknown error occurred'
+        };
+        res.status(500).json(errorResponse);
+    }
+});
+
+router.post('/add-a-user', authorizeRoles('Recruiter', 'Admin'), authenticateToken, async (req, res) => {
+    try {
+        const response = await employeeService.addEmployee(req.body);
+        res.json(response);
+    } catch (error) {
+        const errorResponse: ApiErrorResponse = {
+            success: false,
+            message: 'Failed to add employee',
             error: error instanceof Error ? error.message : 'Unknown error occurred'
         };
         res.status(500).json(errorResponse);

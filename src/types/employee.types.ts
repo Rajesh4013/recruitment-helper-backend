@@ -34,6 +34,7 @@ export interface GetEmployeesResponse {
 }
 
 export interface EmployeeQueryParams {
+    searchBy?: string;
     employeeIdSearch?: string;
     departmentId?: number;
     designation?: string;

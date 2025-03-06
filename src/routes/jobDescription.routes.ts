@@ -2,7 +2,7 @@ import express from 'express';
 import jobDescriptionServices from '../services/jobDescription.services.js';
 import updateTrackerServices from '../services/updateTracker.services.js';
 import resourceRequestServices from '../services/resourceRequest.services.js';
-import employeeServices from '../services/employee.services.js';
+import {employeeService} from '../services/employee.services.js';
 import emailServices from '../services/email.services.js';
 import { formatEmailBody } from '../utils/emailFormatter.js';
 import { Prisma } from '@prisma/client';
@@ -52,9 +52,9 @@ router.post('/job-description', async (req, res) => {
         const updateTrackerResponse = await updateTrackerServices.createUpdateTracker(jdcreationResponse.JobDescriptionID, updateTracker);
 
         // Fetch manager hierarchy and HR emails
-        const managerHierarchy = await employeeServices.getManagerHierarchy(jobDescriptionData.requestedBy);
-        const managerEmails = await employeeServices.getEmailsByEmployeeIds(managerHierarchy);
-        const hrEmails = await employeeServices.getHREmails();
+        const managerHierarchy = await employeeService.getManagerHierarchy(jobDescriptionData.requestedBy);
+        const managerEmails = await employeeService.getEmailsByEmployeeIds(managerHierarchy);
+        const hrEmails = await employeeService.getHREmails();
 
         // Send emails
         // const emailText = formatEmailBody(resourceRequestResponse.ResourceRequestID, jobDescription, resourceRequest, updateTracker, (req as AuthenticatedRequest).user?.name || 'Unknown User');

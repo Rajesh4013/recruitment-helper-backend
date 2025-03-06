@@ -51,37 +51,39 @@ export const authService = {
                 message: 'Login successful'
             };
         } catch (error) {
+            console.log(error);
             throw error;
         }
     },
 
-    async signup(data: SignupRequest): Promise<SignupResponse> {
-        try {
-            const existingUser = await authRepository.findUserByEmail(data.email);
+    // async signup(data: SignupRequest): Promise<SignupResponse> {
+    //     try {
+    //         const existingUser = await authRepository.findUserByEmail(data.email);
 
-            if (existingUser) {
-                return {
-                    success: false,
-                    message: 'Email already registered'
-                };
-            }
+    //         if (existingUser) {
+    //             return {
+    //                 success: false,
+    //                 message: 'Email already registered'
+    //             };
+    //         }
 
-            const result = await authRepository.createUser(data);
+    //         const result = await authRepository.createUser(data);
 
-            return {
-                success: true,
-                data: {
-                    employee: {
-                        EmployeeID: result.employee.EmployeeID,
-                        FirstName: result.employee.FirstName,
-                        LastName: result.employee.LastName,
-                        Role: result.login.Role as UserRole
-                    }
-                },
-                message: 'User registered successfully'
-            };
-        } catch (error) {
-            throw error;
-        }
-    }
+    //         return {
+    //             success: true,
+    //             data: {
+    //                 employee: {
+    //                     EmployeeID: result.employee.EmployeeID,
+    //                     FirstName: result.employee.FirstName,
+    //                     LastName: result.employee.LastName,
+    //                     Role: result.login.Role as UserRole
+    //                 }
+    //             },
+    //             message: 'User registered successfully'
+    //         };
+    //     } catch (error) {
+    //         console.log(error);
+    //         throw error;
+    //     }
+    // }
 };

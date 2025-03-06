@@ -1,6 +1,6 @@
 import { prisma } from '../utils/prisma.js';
 import bcrypt from 'bcrypt';
-import { SignupRequest, UserRole } from '../types/auth.types.js';
+import { UserRole } from '../types/auth.types.js';
 
 const SALT_ROUNDS = 10;
 
@@ -33,42 +33,21 @@ export const authRepository = {
         });
     },
 
-    async createUser(data: SignupRequest) {
-        const result = await prisma.$transaction(async (prisma) => {
-            const employeeData: any = {
-                EmployeeID: data.employeeId,
-                FirstName: data.firstName,
-                LastName: data.lastName,
-                Email: data.email,
-                CreatedAt: new Date()
-            };
-
-            if (data.designation) {
-                employeeData.Designation = data.designation;
+    async createLoginForEmployee(signupData: any) {
+        const hashedPassword = await bcrypt.hash(signupData.PasswordHash, SALT_ROUNDS);
+        console.log(signupData);
+        return await prisma.login.create({
+            data: {
+                Employee: {
+                    connect: {
+                        EmployeeID: signupData.EmployeeID
+                    }   
+                },
+                // EmployeeID: signupData.EmployeeID,
+                Email: signupData.Email,
+                PasswordHash: hashedPassword,
+                Role: signupData.Role as UserRole
             }
-            if (data.departmentId) {
-                employeeData.DepartmentID = data.departmentId;
-            }
-
-            const employee = await prisma.employee.create({
-                data: employeeData
-            });
-
-            const passwordHash = await bcrypt.hash(data.password, SALT_ROUNDS);
-            
-            const login = await prisma.login.create({
-                data: {
-                    EmployeeID: employee.EmployeeID,
-                    Email: data.email,
-                    PasswordHash: passwordHash,
-                    Role: data.role,
-                    LastLogin: new Date()
-                }
-            });
-
-            return { employee, login }; 
         });
-
-        return result;
     }
 }; 

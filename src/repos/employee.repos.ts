@@ -2,6 +2,15 @@ import { prisma } from '../utils/prisma.js';
 import { EmployeeQueryParams } from '../types/employee.types.js';
 
 export const employeeRepository = {
+
+    async createEmployee(employeeDetails: any) {
+        console.log('EmployeeRepository.createEmployee data:', employeeDetails);
+        // employeeDetails.id = "8829BH";
+        const employee = await prisma.employee.create({ data: employeeDetails });
+        console.log(employee);
+        return employee;
+    },
+
     async getAllEmployees(params: EmployeeQueryParams) {
         const {
             page = 1,
@@ -11,13 +20,14 @@ export const employeeRepository = {
             designation,
             employeeIdSearch,
             sortBy = 'EmployeeID',
-            sortOrder = 'asc'
+            sortOrder = 'asc',
+            searchBy
         } = params;
 
         const skip = (page - 1) * limit;
 
         // Get employee IDs that match the employeeId search
-        const matchingEmployeeIds = employeeIdSearch ? 
+        const matchingEmployeeIds = employeeIdSearch ?
             await prisma.employee.findMany({
                 where: {
                     EmployeeID: {
@@ -26,7 +36,7 @@ export const employeeRepository = {
                                 where: { EmployeeID: { gt: 0 } },
                                 select: { EmployeeID: true }
                             })
-                            .then(ids => 
+                            .then(ids =>
                                 ids
                                     .filter(e => e.EmployeeID.toString().includes(employeeIdSearch))
                                     .map(e => e.EmployeeID)
@@ -52,6 +62,11 @@ export const employeeRepository = {
                             }
                         }
                     ]
+                } : {},
+                searchBy === 'Manager' ? {
+                    Login: {
+                        Role: { in: ['TeamLead', 'Manager', 'Admin'] }
+                    }
                 } : {}
             ]
         };
@@ -70,7 +85,8 @@ export const employeeRepository = {
                 },
                 Login: {
                     select: {
-                        Email: true
+                        Email: true,
+                        Role: true
                     }
                 },
                 Employee: {
@@ -104,12 +120,74 @@ export const employeeRepository = {
                         EmployeeID: true,
                         FirstName: true,
                         LastName: true,
-                        Designation: true
+                        Designation: true,
                     }
                 }
             }
         });
 
         return employee;
+    },
+
+    async getEmployeeProfileInfoByID(id: number) {
+        const employee = await prisma.employee.findUnique({
+            where: { EmployeeID: id },
+            include: {
+                Department: {
+                    select: {
+                        DepartmentID: true,
+                        DepartmentName: true
+                    }
+                },
+                Employee: true,
+                Login: {
+                    select: {
+                        Email: true,
+                        Role: true
+                    }
+                }
+            }
+        });
+
+        return employee;
+    },
+
+    async getManagerHierarchy(employeeId: number) {
+        const managers = [];
+        let currentEmployeeId = employeeId;
+
+        while (currentEmployeeId) {
+            const employee = await prisma.employee.findUnique({
+                where: { EmployeeID: currentEmployeeId },
+                select: { ManagerEmployeeID: true }
+            });
+
+            if (employee && employee.ManagerEmployeeID) {
+                managers.push(employee.ManagerEmployeeID);
+                currentEmployeeId = employee.ManagerEmployeeID;
+            } else {
+                break;
+            }
+        }
+
+        return managers;
+    },
+
+    async getEmailsByEmployeeIds(employeeIds: number[]) {
+        const logins = await prisma.login.findMany({
+            where: { EmployeeID: { in: employeeIds } },
+            select: { Email: true }
+        });
+
+        return logins.map(login => login.Email);
+    },
+
+    async getHREmails() {
+        const hrLogins = await prisma.login.findMany({
+            where: { Role: 'Recruiter' },
+            select: { Email: true }
+        });
+
+        return hrLogins.map(login => login.Email);
     }
 };
