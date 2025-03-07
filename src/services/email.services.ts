@@ -27,6 +27,18 @@ class EmailService {
 
         return this.transporter.sendMail(mailOptions);
     }
+
+    async sendJobRequestEmail(to: string[], cc: string[], subject: string, text: string) {
+        const mailOptions = {
+            from: process.env.EMAIL_USER,
+            to: to.join(','),
+            cc: cc.join(','),
+            subject: subject,
+            text: text
+        };
+
+        return this.transporter.sendMail(mailOptions);
+    }
 }
 
 export default new EmailService();

@@ -2,6 +2,7 @@ import { authRepository } from '../repos/auth.repos.js';
 import { employeeRepository } from '../repos/employee.repos.js';
 import { EmployeeQueryParams, GetEmployeesResponse, GetEmployeeResponse } from '../types/employee.types.js';
 import { Prisma } from '@prisma/client';
+import EmailService from './email.services.js';
 
 export const employeeService = {
     async getManagerHierarchy(employeeId: number) {
@@ -27,7 +28,7 @@ export const employeeService = {
                     DepartmentID: parseInt(employeeData.DepartmentID, 10)
                 }
             },
-            other_Employee: {
+            Employee: {
                 connect: {
                     EmployeeID: parseInt(employeeData.ManagerEmployeeID, 10)
                 }
@@ -36,27 +37,49 @@ export const employeeService = {
             MobileNumber: employeeData.MobileNumber || null,
             Address: employeeData.Address || null,
             Gender: employeeData.Gender || null,
-            YearsOfExperience: employeeData.YearsOfExperience || 0,
+            YearsOfExperience: parseInt(employeeData.YearsOfExperience) || 0,
             JoiningDate: new Date(employeeData.JoiningDate) || new Date(),
             IsAdmin: employeeData.IsAdmin || false,
         }
 
-        const createEmployeeResponse = await employeeRepository.createEmployee(employeeDetails);
-        console.log(createEmployeeResponse);
-        const loginDetails: Prisma.LoginCreateInput = {
-            Employee: {
-                connect: {
-                    EmployeeID: createEmployeeResponse.EmployeeID,
-                }
-            },
+        let createEmployeeResponse;
+        try {
+            createEmployeeResponse = await employeeRepository.createEmployee(employeeDetails);
+            console.log('Employee created successfully:', createEmployeeResponse);
+        } catch (error) {
+            console.error('Failed to create employee:', error);
+            return { success: false, message: 'Failed to add employee', error: error };
+        }
+
+        if (!createEmployeeResponse || !createEmployeeResponse.EmployeeID) {
+            console.error('EmployeeID is undefined:', createEmployeeResponse);
+            return { success: false, message: 'Failed to add employee', error: 'EmployeeID is undefined' };
+        }
+
+        const loginDetails = {
+            EmployeeID: createEmployeeResponse.EmployeeID,
             Email: employeeData.Email,
             PasswordHash: employeeData.Password,
             Role: employeeData.Role || 'Employee',
         }
 
-        const createLoginResponse = await authRepository.createLoginForEmployee(loginDetails);
+        try {
+            const createLoginResponse = await authRepository.createLoginForEmployee(loginDetails);
+            console.log('Login created successfully:', createLoginResponse);
+        } catch (error) {
+            console.error('Failed to create login:', error);
+            return { success: false, message: 'Failed to add employee', error: error };
+        }
 
-        return !createEmployeeResponse ? null : createEmployeeResponse
+        // Send email notification
+        const toEmails = await this.getEmailsByEmployeeIds([createEmployeeResponse.EmployeeID]);
+        const ccEmails = await this.getHREmails();
+        const subject = 'New Employee Added';
+        const text = `A new employee has been added (ID: ${createEmployeeResponse.EmployeeID}) ${employeeData.FirstName} ${employeeData.LastName}.`;
+
+        await EmailService.sendJobRequestEmail(toEmails, ccEmails, subject, text);
+
+        return !createEmployeeResponse ? null : createEmployeeResponse;
     },
 
     async getAllEmployees(params: EmployeeQueryParams): Promise<GetEmployeesResponse> {
@@ -143,9 +166,10 @@ export const employeeService = {
                 message: 'Employee not found'
             };
         }
-        
+
         const employeeProfileResponse = {
             Id: employee?.id,
+            EmployeeID: employee?.EmployeeID,
             FirstName: employee?.FirstName,
             LastName: employee?.LastName,
             Email: employee?.Login?.Email,
@@ -165,5 +189,15 @@ export const employeeService = {
         return {
             success: true, data: employeeProfileResponse, message: 'Employee profile retrieved successfully'
         };
+    },
+
+    async updateEmployeeProfile(id: number, data: any) {
+        const response = await employeeRepository.updateEmployeeProfile(id, data);
+        return {
+            EmployeeID: response.EmployeeID,
+            FirstName: response.FirstName,
+            LastName: response.LastName,
+            Designation: response.Designation
+        }
     }
 };

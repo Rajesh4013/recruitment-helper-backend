@@ -1,15 +1,15 @@
 import { CreateJobDescription, CreateResourceRequest, CreateUpdateTracker } from '../types/requests.types.js';
 import resourceRequestServices from '../services/resourceRequest.services.js';
 
-export function formatEmailBody(
-    // requestId: number,
+export async function formatEmailBody(
+    requestId: number,
     jobDescription: CreateJobDescription,
     resourceRequest: CreateResourceRequest,
     updateTracker: CreateUpdateTracker,
     name: string
-): string {
-    // const requestResponse = await resourceRequestServices.getResourceRequestById(requestId);
-    // console.log(requestResponse);
+): Promise<string> {
+    const requestResponse = await resourceRequestServices.getResourceRequestById(requestId);
+    console.log(requestResponse);
     return `
         A new job description has been created by ${name} with the following details:
 

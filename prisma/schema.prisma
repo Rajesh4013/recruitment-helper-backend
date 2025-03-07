@@ -14,7 +14,6 @@ model Department {
 }
 
 model Employee {
-  id                                                  String             @id(map: "PK_Employee") @default("newid()", map: "DF__Employee__id__0B5CAFEA") @db.Char(8)
   EmployeeID                                          Int                @unique(map: "UQ_Employee_EmployeeID")
   FirstName                                           String             @db.VarChar(100)
   LastName                                            String             @db.VarChar(100)
@@ -30,6 +29,7 @@ model Employee {
   Gender                                              String             @default("", map: "DF_Employee_Gender") @db.VarChar(10)
   YearsOfExperience                                   Int?
   JoiningDate                                         DateTime?
+  id                                                  String             @id(map: "PK_Employee") @default(dbgenerated("newid()"), map: "DF__Employee__id__18B6AB08") @db.UniqueIdentifier
   Department                                          Department         @relation(fields: [DepartmentID], references: [DepartmentID], onUpdate: NoAction, map: "FK__Employee__Depart__3B75D760")
   Employee                                            Employee?          @relation("EmployeeToEmployee", fields: [ManagerEmployeeID], references: [EmployeeID], onDelete: NoAction, onUpdate: NoAction, map: "FK__Employee__Manage__3C69FB99")
   other_Employee                                      Employee[]         @relation("EmployeeToEmployee")
@@ -64,12 +64,12 @@ model JobDescription {
 }
 
 model Login {
-  id           String    @id(map: "PK_Login") @default("newid()", map: "DF__Login__id__0A688BB1") @db.Char(8)
   EmployeeID   Int       @unique(map: "UQ_Login_EmployeeID")
   Email        String    @unique(map: "UQ_Login_Email") @db.VarChar(150)
   PasswordHash String    @db.VarChar(255)
   Role         String?   @db.VarChar(20)
   LastLogin    DateTime? @default(now(), map: "DF__Login__LastLogin__01142BA1")
+  id           String    @id(map: "PK_Login") @default(dbgenerated("newid()"), map: "DF__Login__id__1A9EF37A") @db.UniqueIdentifier
   Employee     Employee  @relation(fields: [EmployeeID], references: [EmployeeID], onUpdate: NoAction, map: "FK__Login__EmployeeI__4F7CD00D")
 }
 

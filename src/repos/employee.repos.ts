@@ -1,7 +1,42 @@
 import { prisma } from '../utils/prisma.js';
 import { EmployeeQueryParams } from '../types/employee.types.js';
+import bcrypt from 'bcrypt';
 
 export const employeeRepository = {
+
+    async updateEmployeeProfile(employeeId: number, employeeDetails: any) {
+        if (employeeDetails.CurrentPassword && employeeDetails.NewPassword) {
+            const employeeLogin = await prisma.login.findUnique({
+                where: { EmployeeID: employeeId },
+                select: { PasswordHash: true }
+            });
+
+            if (!employeeLogin) {
+                throw new Error('Employee login not found');
+            }
+
+            const isPasswordMatch = await bcrypt.compare(employeeDetails.CurrentPassword, employeeLogin.PasswordHash);
+            if (!isPasswordMatch) {
+                throw new Error('Current password is incorrect');
+            }
+
+            const newPasswordHash = await bcrypt.hash(employeeDetails.NewPassword, 10);
+            await prisma.login.update({
+                where: { EmployeeID: employeeId },
+                data: { PasswordHash: newPasswordHash }
+            });
+
+            delete employeeDetails.CurrentPassword;
+            delete employeeDetails.NewPassword;
+        }
+
+        const updatedEmployee = await prisma.employee.update({
+            where: { EmployeeID: employeeId },
+            data: employeeDetails
+        });
+
+        return updatedEmployee;
+    },
 
     async createEmployee(employeeDetails: any) {
         console.log('EmployeeRepository.createEmployee data:', employeeDetails);

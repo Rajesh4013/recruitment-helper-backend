@@ -4,6 +4,7 @@ import { UpdateTrackerRepository } from '../repos/updateTracker.repos.js';
 import { Prisma } from '@prisma/client';
 import { CreateResourceRequest } from '../types/requests.types.js';
 import updateTrackerServices from './updateTracker.services.js';
+import { sendJobRequestUpdateEmail } from '../utils/email.Sender.js';
 
 class ResourceRequestService {
     private repository: ResourceRequestRepository;
@@ -142,6 +143,7 @@ class ResourceRequestService {
         }
 
         const updatedResourceRequest = await this.repository.updateResourceRequest(requestId, resourceRequest);
+        // sendJobRequestUpdateEmail(employeeId, );
         return updatedResourceRequest;
     }
 

@@ -93,11 +93,36 @@ router.get('/profile/:id', authenticateToken, async (req, res) => {
 router.post('/add-a-user', authorizeRoles('Recruiter', 'Admin'), authenticateToken, async (req, res) => {
     try {
         const response = await employeeService.addEmployee(req.body);
-        res.json(response);
+        const formattedResponse = {
+            success: true,
+            data: response,
+            message: 'Employee added successfully'
+        }
+        res.status(201).json(formattedResponse);
     } catch (error) {
         const errorResponse: ApiErrorResponse = {
             success: false,
             message: 'Failed to add employee',
+            error: error instanceof Error ? error.message : 'Unknown error occurred'
+        };
+        res.status(500).json(errorResponse);
+    }
+});
+
+router.put('/profile/:id', authenticateToken, async (req, res) => {
+    try {
+        const employeeId = parseInt(req.params.id);
+        const response = await employeeService.updateEmployeeProfile(employeeId, req.body);
+        const formattedResponse = {
+            success: true,
+            data: response,
+            message: 'Employee password updated successfully'
+        }
+        res.status(200).json(formattedResponse);
+    } catch (error) {
+        const errorResponse: ApiErrorResponse = {
+            success: false,
+            message: 'Failed to update employee profile',
             error: error instanceof Error ? error.message : 'Unknown error occurred'
         };
         res.status(500).json(errorResponse);
