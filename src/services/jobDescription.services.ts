@@ -3,6 +3,7 @@ import { Prisma } from '@prisma/client';
 import { CreateJobDescription } from '../types/requests.types.js';
 import updateTrackerServices from './updateTracker.services.js';
 import resourceRequestServices from './resourceRequest.services.js';
+import { sendJobRequestCreateEmail } from '../utils/email.Sender.js';
 
 class JobDescriptionService {
     private repository: JobDescriptionRepository;
@@ -95,6 +96,10 @@ class JobDescriptionService {
         }
         return jobDescription;
     }
+
+    // async getLatestEditsOfJobDescription() {
+
+    // }
 }
 
 export default new JobDescriptionService();

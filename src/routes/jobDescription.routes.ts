@@ -4,10 +4,11 @@ import updateTrackerServices from '../services/updateTracker.services.js';
 import resourceRequestServices from '../services/resourceRequest.services.js';
 import {employeeService} from '../services/employee.services.js';
 import emailServices from '../services/email.services.js';
-import { formatEmailBody } from '../utils/emailFormatter.js';
+// import { formatEmailBody } from '../utils/emailFormatter.js';
 import { Prisma } from '@prisma/client';
 import { CreateJobDescription, CreateResourceRequest, CreateUpdateTracker } from '../types/requests.types.js';
 import { AuthenticatedRequest } from '../types/auth.types.js';
+import { sendJobRequestCreateEmail } from '../utils/email.Sender.js';
 
 const router = express.Router();
 
@@ -51,15 +52,12 @@ router.post('/job-description', async (req, res) => {
         const resourceRequestResponse = await resourceRequestServices.createResourceRequest(jdcreationResponse.JobDescriptionID, resourceRequest);
         const updateTrackerResponse = await updateTrackerServices.createUpdateTracker(jdcreationResponse.JobDescriptionID, updateTracker);
 
-        // Fetch manager hierarchy and HR emails
-        const managerHierarchy = await employeeService.getManagerHierarchy(jobDescriptionData.requestedBy);
-        const managerEmails = await employeeService.getEmailsByEmployeeIds(managerHierarchy);
-        const hrEmails = await employeeService.getHREmails();
-
-        // Send emails
-        const emailText = await formatEmailBody(resourceRequestResponse.ResourceRequestID, jobDescription, resourceRequest, updateTracker, (req as AuthenticatedRequest).user?.name || 'Unknown User');
-        // const emailText = formatEmailBody(jobDescription, resourceRequest, updateTracker, (req as AuthenticatedRequest).user?.name || 'Unknown User');
-        await emailServices.sendEmail(managerEmails, hrEmails, resourceRequest.requestTitle, emailText);
+        const employeeId = (req as AuthenticatedRequest).user?.employeeId;
+        if (employeeId !== undefined) {
+            sendJobRequestCreateEmail(employeeId, resourceRequestResponse.ResourceRequestID);
+        } else {
+            console.error('Error: employeeId is undefined');
+        }
 
         res.status(201).json({
             success: true,
