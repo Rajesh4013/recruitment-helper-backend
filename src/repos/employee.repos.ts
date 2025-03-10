@@ -30,6 +30,14 @@ export const employeeRepository = {
             delete employeeDetails.NewPassword;
         }
 
+        const existingEmployee = await prisma.employee.findUnique({
+            where: { EmployeeID: employeeId }
+        });
+
+        if (!existingEmployee) {
+            throw new Error('Employee not found');
+        }
+
         const updatedEmployee = await prisma.employee.update({
             where: { EmployeeID: employeeId },
             data: employeeDetails

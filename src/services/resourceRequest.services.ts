@@ -4,7 +4,6 @@ import { UpdateTrackerRepository } from '../repos/updateTracker.repos.js';
 import { Prisma } from '@prisma/client';
 import { CreateResourceRequest } from '../types/requests.types.js';
 import updateTrackerServices from './updateTracker.services.js';
-import { sendJobRequestUpdateEmail } from '../utils/email.Sender.js';
 
 class ResourceRequestService {
     private repository: ResourceRequestRepository;

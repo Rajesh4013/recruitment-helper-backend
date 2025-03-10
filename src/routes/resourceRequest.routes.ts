@@ -1,6 +1,9 @@
 import express from 'express';
 import resourceRequestServices from '../services/resourceRequest.services.js';
 import { AuthenticatedRequest } from '../types/auth.types.js';
+import { sendJobRequestUpdateEmail, sendJobRequestUpdateEmailByHR } from '../utils/email.Sender.js';
+import { request } from 'http';
+import { authenticateToken } from '../middleware/auth.middleware.js';
 
 const router = express.Router();
 
@@ -46,6 +49,9 @@ router.put('/resource-request/:requestId', async (req, res) => {
         // console.log(employeeId);
         const data = req.body;
         const updatedResourceRequest = await resourceRequestServices.updateResourceRequest(requestId, employeeId, data);
+        if (updatedResourceRequest) {
+            sendJobRequestUpdateEmail(requestId, employeeId);
+        }
         res.status(200).json({
             success: true,
             data: updatedResourceRequest,
@@ -66,6 +72,9 @@ router.put('/resource-requests/:requestId', async (req, res) => {
         // const employeeId = (req as AuthenticatedRequest).user?.employeeId ?? 0;
         const data = req.body;
         const updatedResourceRequest = await resourceRequestServices.updateResourceRequestById(requestId, data);
+        if (updatedResourceRequest) {
+            sendJobRequestUpdateEmailByHR(requestId);
+        }
         res.status(200).json({
             success: true,
             data: updatedResourceRequest,
