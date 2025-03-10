@@ -1,15 +1,20 @@
 import express from 'express';
 import updateTrackerServices from '../services/updateTracker.services.js';
 import { AuthenticatedRequest } from '../types/auth.types.js';
+import { sendJobRequestUpdateEmailByManager } from '../utils/email.Sender.js';
+import { authenticateToken } from '../middleware/auth.middleware.js';
 
 const router = express.Router();
 
-router.put('/update-tracker/:jobDescriptionId', async (req, res) => {
+router.put('/update-tracker/:jobDescriptionId', authenticateToken, async (req, res) => {
     try {
         const id = parseInt(req.params.jobDescriptionId);
         const employeeId = (req as AuthenticatedRequest).user?.employeeId ?? 0;
         const data = req.body;
         const updatedUpdateTracker = await updateTrackerServices.updateUpdateTracker(id, employeeId, data);
+        if (updatedUpdateTracker) {
+            sendJobRequestUpdateEmailByManager(id, employeeId);
+        }
         res.status(200).json({
             success: true,
             data: updatedUpdateTracker,

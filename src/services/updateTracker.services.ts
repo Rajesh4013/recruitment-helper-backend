@@ -2,6 +2,7 @@ import { UpdateTrackerRepository } from '../repos/updateTracker.repos.js';
 import { InterviewSlotRepository } from '../repos/interviewSlot.repos.js';
 import { Prisma } from '@prisma/client';
 import { CreateUpdateTracker } from '../types/requests.types.js';
+import { prisma } from '../utils/prisma.js';
 
 class UpdateTrackerService {
     private repository: UpdateTrackerRepository;
@@ -89,7 +90,40 @@ class UpdateTrackerService {
                 }
                 : undefined
         }
-        return this.repository.updateUpdateTracker(jobDescriptionId, employeeId, updateTrackerData);
+        console.log(updateTrackerData);
+        return prisma.updateTracker.upsert({
+            where: { EmployeeID_JobDescriptionID: { JobDescriptionID: jobDescriptionId, EmployeeID: employeeId } },
+            update: updateTrackerData,
+            create: {
+                JobDescription: {
+                    connect: {
+                        JobDescriptionID: jobDescriptionId
+                    }
+                },
+                Employee_UpdateTracker_EmployeeIDToEmployee: {
+                    connect: {
+                        EmployeeID: employeeId
+                    }
+                },
+                ExpectedTimeline: data.ExpectedTimeline,
+                Employee_UpdateTracker_Level1PanelIDToEmployee: {
+                        connect: {
+                            EmployeeID: parseInt(data.Level1PanelInterview)
+                        }
+                    },
+                Employee_UpdateTracker_Level2PanelIDToEmployee: {
+                        connect: {
+                            EmployeeID: parseInt(data.Level2PanelInterview)
+                        }
+                    },
+                Level1PanelInterviewSlots: data.Level1PanelInterviewSlots,
+                Level2PanelInterviewSlots: data.Level2PanelInterviewSlots,
+                Status: data.Status,
+                Comments: data.Comments,
+                Priority: { connect: { PriorityID: parseInt(data.Priority) } },
+                BudgetRanges: { connect: { BudgetID: parseInt(data.Budget) } },
+            }
+        });
     }
 
     async getUpdateTrackersByJobDescriptionId(jobDescriptionId: number) {
@@ -120,6 +154,10 @@ class UpdateTrackerService {
         }
 
         return updateTrackers;
+    }
+
+    async getLatestEditsOfUpdateTracker(jobDescriptionId: number) {
+        return this.repository.getLatestEditsOfUpdateTracker(jobDescriptionId);
     }
 }
 
