@@ -10,6 +10,7 @@ import jobDescriptionRoutes from './routes/jobDescription.routes.js';
 import resourceRequestsRoutes from './routes/resourceRequest.routes.js';
 import updateTrackerRoutes from './routes/updateTracker.routes.js';
 import { authenticateToken } from './middleware/auth.middleware.js';
+import aiRoutes from './routes/ai.routes.js';
 
 dotenv.config();
 
@@ -25,8 +26,8 @@ app.use((req, res, next) => {
     next();
 });
 
-
 // Routes
+app.use('/api', aiRoutes);
 app.use('/api/auth', authRoutes);
 app.use(authenticateToken);
 app.use('/api/employees', employeeRoutes);

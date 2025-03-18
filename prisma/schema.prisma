@@ -22,7 +22,6 @@ model Employee {
   ManagerEmployeeID                                   Int?
   IsAdmin                                             Boolean            @default(false, map: "DF__Employee__IsAdmi__778AC167")
   CreatedAt                                           DateTime?          @default(now(), map: "DF__Employee__Create__787EE5A0")
-  EmployeeI                                           Int?
   ProfilePicture                                      Bytes?
   MobileNumber                                        String             @default("", map: "DF_Employee_MobileNumber") @db.VarChar(50)
   Address                                             String             @default("", map: "DF_Employee_Address") @db.VarChar(255)
